@@ -214,7 +214,7 @@ public class IList<E> extends IObject implements List<E> {
 	@Override
 	public E set(int index, E element) {
 		E ret = get(index);
-		set(String.valueOf(index), element);
+		setContent(String.valueOf(index), element);
 		return ret;
 	}
 

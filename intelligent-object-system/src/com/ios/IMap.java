@@ -67,8 +67,11 @@ public class IMap<V> extends IObject implements Map<String, V> {
 
 	@Override
 	public V put(String key, V value) {
-		// TODO Auto-generated method stub
-		return null;
+		V ret = internal.containsKey(key) ? internal.get(key) : null;
+		
+		setContent(key, value);
+		
+		return ret;
 	}
 
 	@Override
@@ -95,26 +98,41 @@ public class IMap<V> extends IObject implements Map<String, V> {
 
 	@Override
 	protected Object getLocal(String propertyName) {
-		// TODO Auto-generated method stub
-		return super.getLocal(propertyName);
+		if (getFieldPropertyNames().contains(propertyName))
+			return super.getLocal(propertyName);
+		else
+			return internal.get(propertyName);
 	}
 
 	@Override
 	protected void setLocal(String propertyName, Object content) {
-		// TODO Auto-generated method stub
-		super.setLocal(propertyName, content);
+		if (getFieldPropertyNames().contains(propertyName)) {
+			super.setLocal(propertyName, content);
+		} else {
+			internal.put(propertyName, (V)content);
+		}
 	}
 
 	@Override
 	protected List<Property> getInstanceProperties() {
-		// TODO Auto-generated method stub
-		return super.getInstanceProperties();
+		List<Property> ret = super.getInstanceProperties();
+		for(String key: internal.keySet())
+			ret.add(new Property(this, key));
+		return ret;
 	}
 
 	@Override
 	public Class<?> getType(String propertyName, boolean runtime) {
-		// TODO Auto-generated method stub
-		return super.getType(propertyName, runtime);
+		if (getFieldPropertyNames().contains(propertyName)) {
+			return super.getType(propertyName, runtime);
+		} else {
+			if (runtime) {
+				Object content = getContent(propertyName);
+				return content == null ? null : content.getClass();
+			} else {
+				return getValueType();
+			}
+		}
 	}
 	
 	public Class<V> getValueType() {

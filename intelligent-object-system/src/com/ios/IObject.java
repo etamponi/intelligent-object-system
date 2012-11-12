@@ -86,7 +86,7 @@ public class IObject {
 			intelligentProperty.setContent(null);
 	}
 
-	public Object get(String propertyPath) {
+	public Object getContent(String propertyPath) {
 		if (propertyPath.isEmpty())
 			return null;
 
@@ -98,15 +98,15 @@ public class IObject {
 			String remainingPath = propertyPath.substring(firstSplit + 1);
 			IObject local = (IObject) getLocal(localProperty);
 			if (local != null)
-				return local.get(remainingPath);
+				return local.getContent(remainingPath);
 			else
 				return null;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T get(String propertyPath, Class<T> contentType) {
-		return (T) get(propertyPath);
+	public <T> T getContent(String propertyPath, Class<T> contentType) {
+		return (T) getContent(propertyPath);
 	}
 
 	public List<Property> getBoundProperties() {
@@ -150,10 +150,10 @@ public class IObject {
 	protected List<Property> getParentsLinksToThis(boolean editable) {
 		return parentsLinkToThis;
 	}
-
-	public List<Property> getProperties() {
-		List<Property> ret = new ArrayList<>();
-
+	
+	public List<String> getFieldPropertyNames() {
+		List<String> ret = new ArrayList<>();
+		
 		Stack<Class<?>> types = new Stack<>();
 		types.add(getClass());
 		while (!types.peek().equals(IObject.class))
@@ -164,9 +164,19 @@ public class IObject {
 				int mod = field.getModifiers();
 				if (Modifier.isPublic(mod) && !Modifier.isStatic(mod)
 						&& !Modifier.isFinal(mod))
-					ret.add(new Property(this, field.getName()));
+					ret.add(field.getName());
 			}
 		}
+		
+		return ret;
+	}
+
+	public List<Property> getProperties() {
+		List<Property> ret = new ArrayList<>();
+
+		for(String name: getFieldPropertyNames())
+			ret.add(new Property(this, name));
+		
 		ret.addAll(getInstanceProperties());
 		return ret;
 	}
@@ -274,7 +284,7 @@ public class IObject {
 		}
 	}
 
-	public void set(String propertyPath, Object content) {
+	public void setContent(String propertyPath, Object content) {
 		if (propertyPath.isEmpty())
 			return;
 
@@ -286,7 +296,7 @@ public class IObject {
 			String remainingPath = propertyPath.substring(firstSplit + 1);
 			IObject local = (IObject) getLocal(localProperty);
 			if (local != null)
-				local.set(remainingPath, content);
+				local.setContent(remainingPath, content);
 		}
 	}
 

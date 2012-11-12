@@ -44,9 +44,9 @@ public class IObjectTest {
 				Node node = j > 0 ? new Node() : new Node(true);
 				grid[i][j] = node;
 				if (i+1 < DIM)
-					node.set("down",  grid[i+1][j]);
+					node.setContent("down",  grid[i+1][j]);
 				if (j+1 < DIM)
-					node.set("right", grid[i][j+1]);
+					node.setContent("right", grid[i][j+1]);
 			}
 		}
 		
@@ -62,14 +62,14 @@ public class IObjectTest {
 		
 		startingTime = System.currentTimeMillis();
 		
-		copy.set("content", "Hello");
+		copy.setContent("content", "Hello");
 		
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Change propagated in copy in: " + elapsed);
 		
 		startingTime = System.currentTimeMillis();
 		
-		copy.set("nonConnected", "Hello");
+		copy.setContent("nonConnected", "Hello");
 		
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Not listened change propagated in copy in: " + elapsed);
@@ -81,7 +81,7 @@ public class IObjectTest {
 		
 		startingTime = System.currentTimeMillis();
 		
-		grid[0][0].set("content", "Hello 2");
+		grid[0][0].setContent("content", "Hello 2");
 		
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Change propagated in original in: " + elapsed);
@@ -117,9 +117,9 @@ public class IObjectTest {
 				Node node = j > 0 ? new Node() : new Node(true);
 				grid[i][j] = node;
 				if (i+1 < DIM)
-					node.set("down",  grid[i+1][j]);
+					node.setContent("down",  grid[i+1][j]);
 				if (j+1 < DIM)
-					node.set("right", grid[i][j+1]);
+					node.setContent("right", grid[i][j+1]);
 			}
 		}
 		
@@ -142,7 +142,7 @@ public class IObjectTest {
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Deserialized in: " + elapsed);
 		
-		copy.set("content", "Hello");
+		copy.setContent("content", "Hello");
 		
 		assertEquals("Hello", copy.right.content);
 		assertEquals("Hello", copy.contentCopy);

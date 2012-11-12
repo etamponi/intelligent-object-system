@@ -22,9 +22,9 @@ public class IListTest {
 		public String other;
 		
 		public A() {
-			set("list", new IList<>(String.class));
-			set("listA", new IList<>(A.class));
-			set("listB", new IList<>(A.class));
+			setContent("list", new IList<>(String.class));
+			setContent("listA", new IList<>(A.class));
+			setContent("listB", new IList<>(A.class));
 			
 			addListener(new PropertyBinding(this, "list.0", "first"));
 			addListener(new PropertyBinding(this, "list.2", "third"));
@@ -41,8 +41,8 @@ public class IListTest {
 		a.list.add("Hello first");
 		a.list.add("Hello second");
 		a.list.add("Hello third");
-		assertEquals(a.get("list.0"), a.first);
-		assertEquals(a.get("list.2"), a.third);
+		assertEquals(a.getContent("list.0"), a.first);
+		assertEquals(a.getContent("list.2"), a.third);
 		
 		a.list.remove(2);
 		assertEquals(null, a.third);

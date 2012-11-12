@@ -16,7 +16,7 @@ public class Property {
 	}
 	
 	public Object getContent() {
-		return root.get(path);
+		return root.getContent(path);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -24,7 +24,7 @@ public class Property {
 		if (path.isEmpty())
 			return (T)root;
 		else
-			return root.get(path, contentType);
+			return root.getContent(path, contentType);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -35,14 +35,14 @@ public class Property {
 			IList<? extends IObject> list;
 			if (indexPre > 0) {
 				indexPre -= 1;
-				list = root.get(path.substring(0, indexPre), IList.class); 
+				list = root.getContent(path.substring(0, indexPre), IList.class); 
 			} else {
 				list = (IList<? extends IObject>)root;
 			}
 			for(int i = 0; i < list.size(); i++)
-				list.get(i).set(path.substring(indexAfter), content);
+				list.get(i).setContent(path.substring(indexAfter), content);
 		} else {
-			root.set(path, content);
+			root.setContent(path, content);
 		}
 	}
 	
@@ -102,7 +102,7 @@ public class Property {
 			return root;
 		
 		String parentPath = path.substring(0, path.lastIndexOf('.'));
-		return root.get(parentPath, IObject.class);
+		return root.getContent(parentPath, IObject.class);
 	}
 	
 	public Property getLocalProperty() {
