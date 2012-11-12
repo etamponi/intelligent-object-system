@@ -9,9 +9,9 @@ import org.junit.Test;
 
 import com.ios.listeners.PropertyBinding;
 
-public class IntelligentObjectTest {
+public class IObjectTest {
 	
-	public static class Node extends IntelligentObject {
+	public static class Node extends IObject {
 		public Node right, down;
 		
 		public String content;
@@ -137,7 +137,7 @@ public class IntelligentObjectTest {
 		startingTime = System.currentTimeMillis();
 		
 		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-		Node copy = IntelligentObject.load(in);
+		Node copy = IObject.load(in);
 		
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Deserialized in: " + elapsed);

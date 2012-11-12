@@ -20,7 +20,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 
 
-public class IntelligentObject {
+public class IObject {
 	
 	public static final int MAXIMUM_CHANGE_PROPAGATION = 5;
 	
@@ -50,7 +50,7 @@ public class IntelligentObject {
 		} else {
 			String localProperty = propertyPath.substring(0, firstSplit);
 			String remainingPath = propertyPath.substring(firstSplit+1);
-			IntelligentObject local = (IntelligentObject)getLocal(localProperty);
+			IObject local = (IObject)getLocal(localProperty);
 			if (local != null)
 				return local.get(remainingPath);
 			else
@@ -78,7 +78,7 @@ public class IntelligentObject {
 		} else {
 			String localProperty = propertyPath.substring(0, firstSplit);
 			String remainingPath = propertyPath.substring(firstSplit+1);
-			IntelligentObject local = (IntelligentObject)getLocal(localProperty);
+			IObject local = (IObject)getLocal(localProperty);
 			if (local != null)
 				local.set(remainingPath, content);
 		}
@@ -92,16 +92,16 @@ public class IntelligentObject {
 		if (oldContent == content)
 			return;
 		
-		if (oldContent instanceof IntelligentObject) {
+		if (oldContent instanceof IObject) {
 			this.intelligentProperties.remove(property);
-			((IntelligentObject)oldContent).parentsLinkToThis.remove(property);
+			((IObject)oldContent).parentsLinkToThis.remove(property);
 		}
 		
 		innerSetLocal(propertyName, content);
 		
-		if (content instanceof IntelligentObject) {
+		if (content instanceof IObject) {
 			this.intelligentProperties.add(property);
-			((IntelligentObject)content).parentsLinkToThis.add(property);
+			((IObject)content).parentsLinkToThis.add(property);
 		}
 		
 		propagateChange(property, HashTreePSet.<Property>empty(), 0);
@@ -156,22 +156,26 @@ public class IntelligentObject {
 				ret.add(new Property(this, field.getName()));
 		}
 		ret.addAll(instanceProperties);
-		return Collections.unmodifiableList(ret);
+		return ret;
 	}
 	
 	public List<Property> getIntelligentProperties() {
-		return Collections.unmodifiableList(intelligentProperties);
+		return new ArrayList<>(intelligentProperties);
+	}
+	
+	public List<Property> getUnboundProperties() {
+		List<Property> ret = getProperties();
+		ret.removeAll(getBoundProperties());
+		return ret;
 	}
 	
 	public List<Property> getBoundProperties() {
 		List<Property> ret = new ArrayList<>();
-		
 		recursivelyFindBoundProperties(this, new Property(this, ""), ret, HashTreePSet.<Property>empty());
-		
 		return ret;
 	}
 	
-	private void recursivelyFindBoundProperties(IntelligentObject original, Property parentPath, List<Property> list, PSet<Property> seen) {
+	private void recursivelyFindBoundProperties(IObject original, Property parentPath, List<Property> list, PSet<Property> seen) {
 		for(ChangeListener l: parentPath.getRoot().listeners)
 			list.addAll(l.getBoundProperties(parentPath, original));
 		
@@ -193,22 +197,22 @@ public class IntelligentObject {
 		return instanceProperties;
 	}
 	
-	public <T extends IntelligentObject> T copy() {
-		IntelligentObject copy = kryo.copy(this);
+	public <T extends IObject> T copy() {
+		IObject copy = kryo.copy(this);
 		
 		for(Property linkToThis: new ArrayList<>(copy.parentsLinkToThis))
 			linkToThis.setContent(null);
 		
-		IdentityHashMap<IntelligentObject, Void> descendents = new IdentityHashMap<>();
-		IdentityHashMap<IntelligentObject, Void> nonDescendents = new IdentityHashMap<>();
+		IdentityHashMap<IObject, Void> descendents = new IdentityHashMap<>();
+		IdentityHashMap<IObject, Void> nonDescendents = new IdentityHashMap<>();
 		for(Property childProperty: copy.intelligentProperties) {
-			childProperty.getContent(IntelligentObject.class).removeInvalidLinks(copy, descendents, nonDescendents);
+			childProperty.getContent(IObject.class).removeInvalidLinks(copy, descendents, nonDescendents);
 		}
 		
 		return (T)copy;
 	}
 	
-	private boolean descendFrom(IntelligentObject ancestor) {
+	private boolean descendFrom(IObject ancestor) {
 		if (this == ancestor)
 			return true;
 		for(Property linkToThis: parentsLinkToThis) {
@@ -218,11 +222,11 @@ public class IntelligentObject {
 		return false;
 	}
 	
-	private void removeInvalidLinks(IntelligentObject ancestor,
-			IdentityHashMap<IntelligentObject, Void> descendents,
-			IdentityHashMap<IntelligentObject, Void> nonDescendents) {
+	private void removeInvalidLinks(IObject ancestor,
+			IdentityHashMap<IObject, Void> descendents,
+			IdentityHashMap<IObject, Void> nonDescendents) {
 		for(Property linkToThis: new ArrayList<>(parentsLinkToThis)) {
-			IntelligentObject parent = linkToThis.getRoot();
+			IObject parent = linkToThis.getRoot();
 			
 			if (descendents.containsKey(parent)) {
 				continue;
@@ -249,7 +253,7 @@ public class IntelligentObject {
 		output.close();
 	}
 	
-	public static <T extends IntelligentObject> T load(InputStream in) {
+	public static <T extends IObject> T load(InputStream in) {
 		Input input = new Input(in);
 		T ret = (T)kryo.readClassAndObject(input);
 		input.close();

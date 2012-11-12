@@ -6,11 +6,11 @@ public class Property {
 	
 	public static final String ANY = "*";
 
-	private final IntelligentObject root;
+	private final IObject root;
 	
 	private final String path;
 
-	public Property(IntelligentObject root, String path) {
+	public Property(IObject root, String path) {
 		this.root = root;
 		this.path = path;
 	}
@@ -27,7 +27,7 @@ public class Property {
 		root.set(path, content);
 	}
 	
-	public IntelligentObject getRoot() {
+	public IObject getRoot() {
 		return root;
 	}
 	
