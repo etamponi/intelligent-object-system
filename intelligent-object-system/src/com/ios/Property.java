@@ -9,13 +9,7 @@ public class Property {
 	private final IntelligentObject root;
 	
 	private final String path;
-	
-	@SuppressWarnings("unused")
-	private Property() {
-		root = null;
-		path = null;
-	}
-	
+
 	public Property(IntelligentObject root, String path) {
 		this.root = root;
 		this.path = path;

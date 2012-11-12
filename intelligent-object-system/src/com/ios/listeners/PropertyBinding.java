@@ -12,12 +12,7 @@ public class PropertyBinding implements ChangeListener {
 	private final Property master;
 	private final List<Property> slaves = new ArrayList<>();
 	private final List<Property> listening = new ArrayList<>();
-	
-	@SuppressWarnings("unused")
-	private PropertyBinding() {
-		master = null;
-	}
-	
+
 	public PropertyBinding(IntelligentObject root, String masterPath, String... slavePaths) {
 		master = new Property(root, masterPath);
 		

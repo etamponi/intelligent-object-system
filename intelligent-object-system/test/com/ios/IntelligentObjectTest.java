@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 
 import org.junit.Test;
 
-import com.esotericsoftware.kryo.Kryo;
 import com.ios.listeners.PropertyBinding;
 
 public class IntelligentObjectTest {
@@ -103,15 +102,6 @@ public class IntelligentObjectTest {
 		
 		elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println(TIMES + " copies in: " + elapsed);
-		
-		startingTime = System.currentTimeMillis();
-		
-		Kryo kryo = new Kryo();
-		for(int i = 0; i < TIMES; i++)
-			kryo.copy(grid[4][4]);
-		
-		elapsed = System.currentTimeMillis() - startingTime;
-		System.out.println(TIMES + " fast copies in: " + elapsed);
 	}
 	
 	@Test
