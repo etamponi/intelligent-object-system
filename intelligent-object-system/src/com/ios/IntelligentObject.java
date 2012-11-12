@@ -22,7 +22,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IntelligentObject {
 	
-	public static final int MAXIMUM_CHANGE_PROPAGATION = 10;
+	public static final int MAXIMUM_CHANGE_PROPAGATION = 5;
 	
 	private static final Kryo kryo = new Kryo();
 	
