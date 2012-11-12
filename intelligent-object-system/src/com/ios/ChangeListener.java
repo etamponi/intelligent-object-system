@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ChangeListener {
 	
-	public List<Property> getBoundProperties(Property prefixPath, IObject root);
+	public List<Property> getBoundProperties(Property prefixPath);
 	
 	public boolean isListening(Property path);
 

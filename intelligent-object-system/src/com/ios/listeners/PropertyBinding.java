@@ -31,11 +31,11 @@ public class PropertyBinding implements ChangeListener {
 	}
 
 	@Override
-	public List<Property> getBoundProperties(Property prefixPath, IObject root) {
+	public List<Property> getBoundProperties(Property prefixPath) {
 		List<Property> ret = new ArrayList<>();
 		for(Property slave: slaves) {
 			if (prefixPath.isParent(slave))
-				ret.add(new Property(root, slave.getLastPart()));
+				ret.add(slave.getLocalProperty());
 		}
 		return ret;
 	}

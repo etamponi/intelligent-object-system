@@ -19,12 +19,31 @@ public class Property {
 		return root.get(path);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <T> T getContent(Class<T> contentType) {
-		return root.get(path, contentType);
+		if (path.isEmpty())
+			return (T)root;
+		else
+			return root.get(path, contentType);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setContent(Object content) {
-		root.set(path, content);
+		if (path.contains(ANY)) {
+			int indexPre = path.indexOf('*');
+			int indexAfter = indexPre + 2;
+			IList<? extends IObject> list;
+			if (indexPre > 0) {
+				indexPre -= 1;
+				list = root.get(path.substring(0, indexPre), IList.class); 
+			} else {
+				list = (IList<? extends IObject>)root;
+			}
+			for(int i = 0; i < list.size(); i++)
+				list.get(i).set(path.substring(indexAfter), content);
+		} else {
+			root.set(path, content);
+		}
 	}
 	
 	public IObject getRoot() {
@@ -78,11 +97,33 @@ public class Property {
 		}
 	}
 	
-	public String getLastPart() {
+	public IObject getParent() {
 		if (!path.contains("."))
-			return path;
+			return root;
 		
-		return path.substring(path.lastIndexOf('.'));
+		String parentPath = path.substring(0, path.lastIndexOf('.'));
+		return root.get(parentPath, IObject.class);
+	}
+	
+	public Property getLocalProperty() {
+		if (!path.contains("."))
+			return this;
+		
+		return new Property(getParent(), path.substring(path.lastIndexOf('.')+1));
+	}
+	
+	public Class<?> getContentType(boolean runtime) {
+		if (runtime) {
+			Object content = getContent();
+			return content == null ? null : content.getClass();
+		} else {
+			try {
+				Property local = getLocalProperty();
+				return local.root.getClass().getField(local.path).getType();
+			} catch (NoSuchFieldException | SecurityException e) {
+				return null;
+			}
+		}
 	}
 	
 }
