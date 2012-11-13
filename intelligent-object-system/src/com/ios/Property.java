@@ -16,15 +16,15 @@ public class Property {
 	}
 	
 	public Object getContent() {
-		return root.getContent(path);
+		if (path.isEmpty())
+			return root;
+		else
+			return root.getContent(path);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T> T getContent(Class<T> contentType) {
-		if (path.isEmpty())
-			return (T)root;
-		else
-			return root.getContent(path, contentType);
+		return (T)getContent();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -66,7 +66,7 @@ public class Property {
 	
 	@Override
 	public String toString() {
-		return "<"+root+">" + (path.isEmpty() ? "" : "." + path) + " = " + getContent();
+		return "<"+root+">" + (path.isEmpty() ? "" : "." + path);
 	}
 	
 	public boolean isParent(Property complete) {
@@ -124,6 +124,11 @@ public class Property {
 				return null;
 			}
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return root.hashCode() + path.hashCode();
 	}
 	
 }

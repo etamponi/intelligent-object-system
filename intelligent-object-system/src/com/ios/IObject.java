@@ -6,10 +6,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -46,6 +49,9 @@ public class IObject {
 	private final List<Property> parentsLinkToThis = new ArrayList<>();
 
 	private final List<ChangeListener> listeners = new ArrayList<>();
+	
+	@SuppressWarnings("rawtypes")
+	private final Map<Property, List<ErrorCheck>> errorChecks = new HashMap<>();
 
 	public String name = String.format("%s-%3d", getClass().getSimpleName(), hashCode() % 1000);
 
@@ -119,7 +125,70 @@ public class IObject {
 	public Map<Property, List<String>> getErrors() {
 		Map<Property, List<String>> ret = new LinkedHashMap<>();
 
-		// FIXME getErrors() implementation
+		recursivelyGetErrors(new Property(this, ""), ret, new HashSet<IObject>());
+		
+		return ret;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	protected void addErrorCheck(String propertyName, ErrorCheck check) {
+		Property property = new Property(this, propertyName);
+		if (!errorChecks.containsKey(property))
+			errorChecks.put(property, new ArrayList<ErrorCheck>());
+		errorChecks.get(property).add(check);
+	}
+	
+	private void recursivelyGetErrors(Property basePath, Map<Property, List<String>> errors, Set<IObject> seen) {
+		IObject parent = basePath.getContent(IObject.class);
+		if (seen.contains(parent))
+			return;
+		else
+			seen.add(parent);
+		
+		for(Property property: parent.getUnboundProperties()) {
+			Property complete = appendChild(basePath, property);
+			errors.put(complete, parent.checkErrors(property));
+			
+			if (property.getContent() instanceof IObject) {
+				recursivelyGetErrors(complete, errors, seen);
+			}
+		}
+	}
+	
+	public String printErrors() {
+		Map<Property, List<String>> errors = getErrors();
+		StringBuilder builder = new StringBuilder();
+		
+		for(Property property: errors.keySet()) {
+			List<String> currentErrors = errors.get(property);
+			if (currentErrors.isEmpty())
+				continue;
+			
+			builder.append(property).append(":\n");
+			for(String error: currentErrors)
+				builder.append("\t").append(error).append("\n");
+		}
+		
+		return builder.toString();
+	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private List<String> checkErrors(Property property) {
+		List<String> ret = new ArrayList<>();
+		Object content = property.getContent();
+		if (content == null) {
+			ret.add("is null");
+		} else {
+			if (errorChecks.containsKey(property)) {
+				for (ErrorCheck check: errorChecks.get(property))
+					ret.addAll(check.getErrors(content));
+			}
+		}
 		
 		return ret;
 	}
@@ -233,6 +302,13 @@ public class IObject {
 			return parent;
 		else
 			return new Property(parent.getRoot(), parent.getPath() + "." + path.getPath());
+	}
+	
+	private Property appendChild(Property path, Property child) {
+		if (path.getPath().isEmpty())
+			return child;
+		else
+			return new Property(path.getRoot(), path.getPath() + "." + child.getPath());
 	}
 	
 	protected void propagateChange(Property property) {

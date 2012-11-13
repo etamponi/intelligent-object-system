@@ -2,6 +2,7 @@ package com.ios;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,8 @@ public class IMap<V> extends IObject implements Map<String, V> {
 	
 	private final Map<String, V> internal;
 	
+	private boolean propagate = true;
+	
 	public IMap(Class<V> valueType) {
 		this.valueType = valueType;
 		
@@ -32,7 +35,11 @@ public class IMap<V> extends IObject implements Map<String, V> {
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
+		propagate = false;
+		for(String key: new HashSet<>(internal.keySet()))
+			remove(key);
+		propagate = true;
+		propagateChange(new Property(this, ""));
 	}
 
 	@Override
@@ -93,7 +100,8 @@ public class IMap<V> extends IObject implements Map<String, V> {
 			((IObject) oldContent).getParentsLinksToThis(true).remove(property);
 		}
 		
-		propagateChange(new Property(this, ""));
+		if (propagate)
+			propagateChange(new Property(this, ""));
 		
 		return oldContent;
 	}
