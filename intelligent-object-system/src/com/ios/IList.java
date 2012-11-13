@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.pcollections.HashTreePSet;
-
 import com.esotericsoftware.kryo.serializers.FieldSerializer;
 
 public class IList<E> extends IObject implements List<E> {
@@ -46,7 +44,7 @@ public class IList<E> extends IObject implements List<E> {
 			}
 			
 			if (propagate)
-				propagateChange(property, HashTreePSet.<Property> empty(), 0);
+				propagateChange(property);
 		}
 		
 		return ret;
@@ -73,7 +71,7 @@ public class IList<E> extends IObject implements List<E> {
 		}
 		
 		if (propagate)
-			propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+			propagateChange(new Property(this, ""));
 	}
 
 	@Override
@@ -82,7 +80,7 @@ public class IList<E> extends IObject implements List<E> {
 		for(E e: c)
 			add(e);
 		propagate = true;
-		propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+		propagateChange(new Property(this, ""));
 		
 		return true;
 	}
@@ -93,7 +91,7 @@ public class IList<E> extends IObject implements List<E> {
 		for(E e: c)
 			add(index, e);
 		propagate = true;
-		propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+		propagateChange(new Property(this, ""));
 		return true;
 	}
 
@@ -182,7 +180,7 @@ public class IList<E> extends IObject implements List<E> {
 		}
 		
 		if (propagate)
-			propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+			propagateChange(new Property(this, ""));
 		
 		return oldContent;
 	}
@@ -193,7 +191,7 @@ public class IList<E> extends IObject implements List<E> {
 		for(Object e: c)
 			remove(e);
 		propagate = true;
-		propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+		propagateChange(new Property(this, ""));
 		
 		return true;
 	}
@@ -206,7 +204,7 @@ public class IList<E> extends IObject implements List<E> {
 				remove(e);
 		}
 		propagate = true;
-		propagateChange(new Property(this, ""), HashTreePSet.<Property> empty(), 0);
+		propagateChange(new Property(this, ""));
 		
 		return true;
 	}

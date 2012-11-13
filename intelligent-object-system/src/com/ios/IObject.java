@@ -234,8 +234,12 @@ public class IObject {
 		else
 			return new Property(parent.getRoot(), parent.getPath() + "." + path.getPath());
 	}
+	
+	protected void propagateChange(Property property) {
+		propagateChange(property, HashTreePSet.<Property> empty(), 0);
+	}
 
-	protected void propagateChange(Property property, PSet<Property> seen, int level) {
+	private void propagateChange(Property property, PSet<Property> seen, int level) {
 		property.getRoot().notifyChange(property);
 
 		if (level == MAXIMUM_CHANGE_PROPAGATION)

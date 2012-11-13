@@ -76,14 +76,26 @@ public class IMap<V> extends IObject implements Map<String, V> {
 
 	@Override
 	public void putAll(Map<? extends String, ? extends V> other) {
-		// TODO Auto-generated method stub
-
+		for(Entry<? extends String, ? extends V> entry: other.entrySet()) {
+			setContent(entry.getKey(), entry.getValue());
+		}
 	}
 
 	@Override
 	public V remove(Object key) {
-		// TODO Auto-generated method stub
-		return null;
+		Property property = new Property(this, key.toString());
+		
+		V oldContent = get(key);
+		
+		internal.remove(key);
+		
+		if (oldContent instanceof IObject) {
+			((IObject) oldContent).getParentsLinksToThis(true).remove(property);
+		}
+		
+		propagateChange(new Property(this, ""));
+		
+		return oldContent;
 	}
 
 	@Override
@@ -104,6 +116,7 @@ public class IMap<V> extends IObject implements Map<String, V> {
 			return internal.get(propertyName);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void setLocal(String propertyName, Object content) {
 		if (getFieldPropertyNames().contains(propertyName)) {
