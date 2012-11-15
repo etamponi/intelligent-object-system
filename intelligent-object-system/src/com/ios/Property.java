@@ -41,7 +41,6 @@ public class Property {
 		return (T)getContent();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setContent(Object content) {
 		if (path.contains(ANY)) {
 			int indexPre = path.indexOf('*');

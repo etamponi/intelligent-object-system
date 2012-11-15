@@ -34,6 +34,7 @@ public class IObject {
 
 	static {
 		kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+		kryo.addDefaultSerializer(LinkList.class, LinkListSerializer.class);
 	}
 	
 	public static Kryo getKryo() {
@@ -59,7 +60,7 @@ public class IObject {
 		return ret;
 	}
 
-	private final List<Property> parentsLinkToThis = new ArrayList<>();
+	private final LinkList parentsLinkToThis = new LinkList();
 
 	private final List<Trigger> triggers = new ArrayList<>();
 	
@@ -110,23 +111,17 @@ public class IObject {
 	}
 
 	public <T extends IObject> T copy() {
-		List<Property> temp = new ArrayList<>(parentsLinkToThis);
-		parentsLinkToThis.clear();
+		kryo.getContext().put("root", this);
 		
 		IObject copy = kryo.copy(this);
-
-		copy.removeInvalidLinks(copy, new HashSet<IObject>(), new HashSet<IObject>());
-		
-		parentsLinkToThis.addAll(temp);
-
 		return (T) copy;
 	}
 
-	private boolean descendFrom(IObject ancestor) {
-		if (this == ancestor)
+	public boolean isAncestor(IObject object) {
+		if (this == object)
 			return true;
-		for (Property linkToThis : parentsLinkToThis) {
-			if (linkToThis.getRoot().descendFrom(ancestor))
+		for (Property linkToThis : object.parentsLinkToThis) {
+			if (this.isAncestor(linkToThis.getRoot()))
 				return true;
 		}
 		return false;
@@ -367,7 +362,7 @@ public class IObject {
 			}
 		}
 	}
-
+/*
 	private void removeInvalidLinks(IObject root, HashSet<IObject> descendents, HashSet<IObject> nonDescendents) {
 		for (Property linkToThis : new ArrayList<>(parentsLinkToThis)) {
 			IObject parent = linkToThis.getRoot();
@@ -395,7 +390,7 @@ public class IObject {
 		}
 		
 	}
-
+*/
 	public void setContent(String propertyPath, Object content) {
 		if (propertyPath.isEmpty())
 			return;

@@ -35,7 +35,7 @@ public class IObjectTest {
 
 	@Test
 	public void testCopy() {
-		final int DIM = 32;
+		final int DIM = 12;
 		final int TIMES = 100;
 		
 		Node[][] grid = new Node[DIM][DIM];
@@ -104,7 +104,7 @@ public class IObjectTest {
 	
 	@Test
 	public void testSerialization() {
-		final int DIM = 32;
+		final int DIM = 12;
 		
 		Node[][] grid = new Node[DIM][DIM];
 		
