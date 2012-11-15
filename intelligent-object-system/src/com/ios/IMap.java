@@ -97,7 +97,7 @@ public class IMap<V> extends IObject implements Map<String, V> {
 		internal.remove(key);
 		
 		if (oldContent instanceof IObject) {
-			((IObject) oldContent).getParentsLinksToThis(true).remove(property);
+			((IObject) oldContent).getParentsLinksToThis().remove(property);
 		}
 		
 		if (propagate)

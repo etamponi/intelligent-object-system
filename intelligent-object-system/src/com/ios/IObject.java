@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -62,7 +61,7 @@ public class IObject {
 
 	private final List<Property> parentsLinkToThis = new ArrayList<>();
 
-	private final List<Listener> listeners = new ArrayList<>();
+	private final List<Trigger> triggers = new ArrayList<>();
 	
 	private final Map<Property, List<ErrorCheck>> errorChecks = new HashMap<>();
 	
@@ -84,11 +83,11 @@ public class IObject {
 		errorChecks.get(property).add(check);
 	}
 
-	protected void addListener(Listener listener) {
-		this.listeners.add(listener);
+	protected void addTrigger(Trigger trigger) {
+		this.triggers.add(trigger);
 	}
 
-	protected Property appendChild(Property path, Property child) {
+	private Property appendChild(Property path, Property child) {
 		if (path.getPath().isEmpty())
 			return child;
 		else
@@ -239,11 +238,7 @@ public class IObject {
 		return fieldAccess.get(this, propertyName);
 	}
 	
-	public List<Property> getParentsLinksToThis() {
-		return Collections.unmodifiableList(parentsLinkToThis);
-	}
-	
-	protected List<Property> getParentsLinksToThis(boolean editable) {
+	protected List<Property> getParentsLinksToThis() {
 		return parentsLinkToThis;
 	}
 
@@ -284,14 +279,12 @@ public class IObject {
 		propagateChange(property, HashTreePSet.<Property> empty(), 0);
 	}
 
-	private void notifyChange(Property changedPath) {
-		for (Listener listener : listeners) {
-			if (listener.isListeningOn(changedPath))
-				listener.action(changedPath);
-		}
+	private void checkTriggers(Property changedPath) {
+		for (Trigger t: triggers)
+			t.checkTrigger(changedPath);
 	}
 
-	protected Property prependParent(Property parent, Property path) {
+	private Property prependParent(Property parent, Property path) {
 		if (path.getPath().isEmpty())
 			return parent;
 		else
@@ -320,7 +313,7 @@ public class IObject {
 	}
 	
 	private void propagateChange(Property property, PSet<Property> seen, int level) {
-		property.getRoot().notifyChange(property);
+		property.getRoot().checkTriggers(property);
 
 		if (level == MAXIMUM_CHANGE_PROPAGATION)
 			return;
@@ -333,8 +326,8 @@ public class IObject {
 	}
 
 	private void recursivelyFindBoundProperties(Property prefixPath, List<Property> list, PSet<Property> seen) {
-		for (Listener l: listeners)
-			list.addAll(l.getBoundProperties(prefixPath));
+		for (Trigger t: triggers)
+			list.addAll(t.getLocalBoundProperties(prefixPath));
 
 		for (Property linkToThis: parentsLinkToThis) {
 			if (seen.contains(linkToThis))

@@ -2,13 +2,15 @@ package com.ios.tests;
 
 import static org.junit.Assert.*;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.junit.Test;
 
 import com.ios.IObject;
-import com.ios.listeners.PropertyBinding;
+import com.ios.triggers.MasterSlaveTrigger;
+
 
 public class IObjectTest {
 	
@@ -22,11 +24,11 @@ public class IObjectTest {
 		public String nonConnected;
 		
 		public Node() {
-			addListener(new PropertyBinding(this, "content", "right.content", "contentCopy"));
+			addTrigger(new MasterSlaveTrigger(this, "content", "right.content", "contentCopy"));
 		}
 		
 		public Node(boolean downConnected) {
-			addListener(new PropertyBinding(this, "content", "right.content", "down.content", "contentCopy"));
+			addTrigger(new MasterSlaveTrigger(this, "content", "right.content", "down.content", "contentCopy"));
 		}
 		
 	}
@@ -54,12 +56,7 @@ public class IObjectTest {
 		long elapsed = System.currentTimeMillis() - startingTime;
 		System.out.println("Grid prepared in: " + elapsed);
 		
-		assertEquals(2, grid[4][4].getParentsLinksToThis().size());
-		
 		Node copy = grid[4][4].copy();
-		
-		assertEquals(0, copy.getParentsLinksToThis().size());
-		assertEquals(1, copy.right.getParentsLinksToThis().size());
 		
 		startingTime = System.currentTimeMillis();
 		

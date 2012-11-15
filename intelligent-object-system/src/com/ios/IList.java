@@ -40,7 +40,7 @@ public class IList<E> extends IObject implements List<E> {
 		
 		if (ret) {
 			if (e instanceof IObject) {
-				((IObject) e).getParentsLinksToThis(true).add(property);
+				((IObject) e).getParentsLinksToThis().add(property);
 			}
 			
 			if (propagate)
@@ -57,7 +57,7 @@ public class IList<E> extends IObject implements List<E> {
 		internal.add(index, element);
 		
 		if (element instanceof IObject) {
-			((IObject) element).getParentsLinksToThis(true).add(property);
+			((IObject) element).getParentsLinksToThis().add(property);
 		}
 		
 		for(index = index+1; index < size(); index++) {
@@ -66,7 +66,7 @@ public class IList<E> extends IObject implements List<E> {
 				Property oldProperty = new Property(this, String.valueOf(index-1));
 				Property newProperty = new Property(this, String.valueOf(index));
 				int linkIndex = ((IObject) content).getParentsLinksToThis().indexOf(oldProperty);
-				((IObject) content).getParentsLinksToThis(true).set(linkIndex, newProperty);
+				((IObject) content).getParentsLinksToThis().set(linkIndex, newProperty);
 			}
 		}
 		
@@ -166,7 +166,7 @@ public class IList<E> extends IObject implements List<E> {
 		internal.remove(index);
 		
 		if (oldContent instanceof IObject) {
-			((IObject) oldContent).getParentsLinksToThis(true).remove(property);
+			((IObject) oldContent).getParentsLinksToThis().remove(property);
 		}
 		
 		for(; index < size(); index++) {
@@ -175,7 +175,7 @@ public class IList<E> extends IObject implements List<E> {
 				Property oldProperty = new Property(this, String.valueOf(index+1));
 				Property newProperty = new Property(this, String.valueOf(index));
 				int linkIndex = ((IObject) content).getParentsLinksToThis().indexOf(oldProperty);
-				((IObject) content).getParentsLinksToThis(true).set(linkIndex, newProperty);
+				((IObject) content).getParentsLinksToThis().set(linkIndex, newProperty);
 			}
 		}
 		

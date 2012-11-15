@@ -1,13 +1,13 @@
 package com.ios.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import com.ios.IList;
 import com.ios.IObject;
-import com.ios.Property;
-import com.ios.listeners.PropertyBinding;
+import com.ios.triggers.MasterSlaveTrigger;
+
 
 public class IListTest {
 	
@@ -29,12 +29,12 @@ public class IListTest {
 			setContent("listA", new IList<>(A.class));
 			setContent("listB", new IList<>(A.class));
 			
-			addListener(new PropertyBinding(this, "list.0", "first"));
-			addListener(new PropertyBinding(this, "list.2", "third"));
+			addTrigger(new MasterSlaveTrigger(this, "list.0", "first"));
+			addTrigger(new MasterSlaveTrigger(this, "list.2", "third"));
 			
-			addListener(new PropertyBinding(this, "listA.0.first", "other"));
+			addTrigger(new MasterSlaveTrigger(this, "listA.0.first", "other"));
 			
-			addListener(new PropertyBinding(this, "other", "listB.*.first"));
+			addTrigger(new MasterSlaveTrigger(this, "other", "listB.*.first"));
 		}
 	}
 	
@@ -64,20 +64,12 @@ public class IListTest {
 		assertEquals("Hello first copy", copy.first);
 		
 		copy.listA.set(0, a);
-		assertEquals(0, copy.getParentsLinksToThis().size());
 		assertEquals("Hello first", copy.other);
-		assertEquals(2, a.getParentsLinksToThis().size());
-		assertTrue(a.getParentsLinksToThis().contains(new Property(a.listA, "0")));
-		assertTrue(a.getParentsLinksToThis().contains(new Property(copy.listA, "0")));
 		
 		copy.listA.add(0, copy);
-		assertTrue(!a.getParentsLinksToThis().contains(new Property(copy.listA, "0")));
-		assertTrue(a.getParentsLinksToThis().contains(new Property(copy.listA, "1")));
 		
 		copy.listA.remove(copy);
-		assertTrue(a.getParentsLinksToThis().contains(new Property(copy.listA, "0")));
-		assertTrue(!a.getParentsLinksToThis().contains(new Property(copy.listA, "1")));
-
+		
 		copy.listB.add(new A());
 		copy.listB.add(new A());
 		assertEquals("Hello first", copy.listB.get(1).first);

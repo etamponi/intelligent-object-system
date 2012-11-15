@@ -1,28 +1,31 @@
-package com.ios.listeners;
+package com.ios.triggers;
 
 import com.ios.IObject;
-import com.ios.Listener;
 import com.ios.Property;
+import com.ios.Trigger;
+import com.ios.listeners.PrefixListener;
 
-public class PropertyBinding extends Listener {
+public class MasterSlaveTrigger extends Trigger {
 	
 	private final Property master;
 
-	public PropertyBinding(IObject root, String masterPath, String... slavePaths) {
+	public MasterSlaveTrigger(IObject root, String masterPath, String... slavePaths) {
+		assert(slavePaths.length > 0);
+		
 		master = new Property(root, masterPath);
 		
-		getListenedPaths().add(master);
+		getListeners().add(new PrefixListener(master));
 		
 		for(String slavePath: slavePaths) {
 			if (slavePath.split(".").length >= IObject.MAXIMUM_CHANGE_PROPAGATION)
 				System.err.println("Warning: change propagation will be incomplete");
 			
-			getSlaves().add(new Property(root, slavePath));
+			getBoundProperties().add(new Property(root, slavePath));
 			
 			if (!slavePath.contains("."))
 				continue;
 			String prefix = slavePath.substring(0, slavePath.lastIndexOf('.'));
-			getListenedPaths().add(new Property(root, prefix));
+			getListeners().add(new PrefixListener(new Property(root, prefix)));
 		}
 	}
 
@@ -30,10 +33,10 @@ public class PropertyBinding extends Listener {
 	public void action(Property changedPath) {
 		Object masterContent = master.getContent();
 		if (changedPath.isPrefix(master, false)) {
-			for(Property slave: getSlaves())
+			for(Property slave: getBoundProperties())
 				slave.setContent(masterContent);
 		} else {
-			for(Property slave: getSlaves()) {
+			for(Property slave: getBoundProperties()) {
 				if (changedPath.isPrefix(slave, false))
 					slave.setContent(masterContent);
 			}

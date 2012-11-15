@@ -2,6 +2,7 @@ package com.ios.tests;
 
 import static org.junit.Assert.*;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -9,7 +10,8 @@ import org.junit.Test;
 
 import com.ios.IMap;
 import com.ios.IObject;
-import com.ios.listeners.PropertyBinding;
+import com.ios.triggers.MasterSlaveTrigger;
+
 
 public class IMapTest {
 	
@@ -23,9 +25,9 @@ public class IMapTest {
 			setContent("map1", new IMap<>(String.class));
 			setContent("map2", new IMap<>(A.class));
 			
-			addListener(new PropertyBinding(this, "property1", "map1.copy1"));
-			addListener(new PropertyBinding(this, "map1.copy1", "map2.nested1.property1"));
-			addListener(new PropertyBinding(this, "map2.nested2.property1", "map1.copy2"));
+			addTrigger(new MasterSlaveTrigger(this, "property1", "map1.copy1"));
+			addTrigger(new MasterSlaveTrigger(this, "map1.copy1", "map2.nested1.property1"));
+			addTrigger(new MasterSlaveTrigger(this, "map2.nested2.property1", "map1.copy2"));
 		}
 	}
 

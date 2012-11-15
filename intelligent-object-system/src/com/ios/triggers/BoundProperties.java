@@ -1,14 +1,14 @@
-package com.ios.listeners;
+package com.ios.triggers;
 
 import com.ios.IObject;
-import com.ios.Listener;
 import com.ios.Property;
+import com.ios.Trigger;
 
-public class BoundProperties extends Listener {
+public class BoundProperties extends Trigger {
 	
 	public BoundProperties(IObject root, String... propertyNames) {
 		for(String name: propertyNames)
-			getSlaves().add(new Property(root, name));
+			getBoundProperties().add(new Property(root, name));
 	}
 
 	@Override

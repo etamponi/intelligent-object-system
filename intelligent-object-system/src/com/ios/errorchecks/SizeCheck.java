@@ -11,9 +11,11 @@
 package com.ios.errorchecks;
 
 
+
 import java.util.Collection;
 
 import com.ios.ErrorCheck;
+
 
 public class SizeCheck implements ErrorCheck<Collection<?>> {
 	
