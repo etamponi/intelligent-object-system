@@ -112,8 +112,8 @@ public class IObject {
 
 	public <T extends IObject> T copy() {
 		kryo.getContext().put("root", this);
-		
 		IObject copy = kryo.copy(this);
+		kryo.getContext().remove("root");
 		return (T) copy;
 	}
 
