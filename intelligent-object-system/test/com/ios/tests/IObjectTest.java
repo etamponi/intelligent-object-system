@@ -35,7 +35,7 @@ public class IObjectTest {
 
 	@Test
 	public void testCopy() {
-		final int DIM = 12;
+		final int DIM = 20;
 		final int TIMES = 100;
 		
 		Node[][] grid = new Node[DIM][DIM];
@@ -63,6 +63,7 @@ public class IObjectTest {
 		copy.setContent("content", "Hello");
 		
 		elapsed = System.currentTimeMillis() - startingTime;
+		assertEquals("Hello", copy.right.right.right.content);
 		System.out.println("Change propagated in copy in: " + elapsed);
 		
 		startingTime = System.currentTimeMillis();
