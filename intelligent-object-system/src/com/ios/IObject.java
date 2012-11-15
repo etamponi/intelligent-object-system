@@ -83,7 +83,7 @@ public class IObject {
 		errorChecks.get(property).add(check);
 	}
 
-	protected void addTrigger(Trigger trigger) {
+	public void addTrigger(Trigger trigger) {
 		this.triggers.add(trigger);
 	}
 
@@ -101,8 +101,11 @@ public class IObject {
 			ret.add("is null");
 		} else {
 			if (errorChecks.containsKey(property)) {
-				for (ErrorCheck check: errorChecks.get(property))
-					ret.add(check.getError(content));
+				for (ErrorCheck check: errorChecks.get(property)) {
+					String error = check.getError(content);
+					if (error != null)
+						ret.add(error);
+				}
 			}
 		}
 		
@@ -110,21 +113,17 @@ public class IObject {
 	}
 
 	public <T extends IObject> T copy() {
-		List<Property> temp = new ArrayList<>(parentsLinkToThis);
-		parentsLinkToThis.clear();
-		
 		IObject copy = kryo.copy(this);
 
 		copy.removeInvalidLinks(copy, new HashSet<IObject>(), new HashSet<IObject>());
-		
-		parentsLinkToThis.addAll(temp);
 
 		return (T) copy;
 	}
 
 	private boolean descendFrom(IObject ancestor) {
-		if (this == ancestor)
+		if (this == ancestor) {
 			return true;
+		}
 		for (Property linkToThis : parentsLinkToThis) {
 			if (linkToThis.getRoot().descendFrom(ancestor))
 				return true;
@@ -233,7 +232,6 @@ public class IObject {
 	}
 
 	protected Object getLocal(String propertyName) {
-		// TODO Add access through getter
 		FieldAccess fieldAccess = FieldAccess.get(getClass());
 		return fieldAccess.get(this, propertyName);
 	}
@@ -258,7 +256,7 @@ public class IObject {
 		return ret;
 	}
 
-	private void innerSetLocal(String propertyName, Object content) {
+	private void innerSetLocal(String propertyName, Object content, boolean copying) {
 		Property property = new Property(this, propertyName);
 
 		Object oldContent = getLocal(propertyName);
@@ -276,7 +274,8 @@ public class IObject {
 			((IObject) content).parentsLinkToThis.add(property);
 		}
 
-		propagateChange(property, HashTreePSet.<Property> empty(), 0);
+		if (!copying)
+			propagateChange(property, HashTreePSet.<Property> empty(), 0);
 	}
 
 	private void checkTriggers(Property changedPath) {
@@ -377,7 +376,7 @@ public class IObject {
 			}
 
 			if (nonDescendents.contains(parent)) {
-				linkToThis.setContent(null);
+				linkToThis.setContent(null, true);
 				continue;
 			}
 
@@ -385,35 +384,37 @@ public class IObject {
 				descendents.add(parent);
 			} else {
 				nonDescendents.add(parent);
-				linkToThis.setContent(null);
+				linkToThis.setContent(null, true);
 			}
-			
-			for (Property childProperty: getIntelligentProperties()) {
-				childProperty.getContent(IObject.class).removeInvalidLinks(root, descendents, nonDescendents);
-			}
-
+		}
+		
+		for (Property childProperty: getIntelligentProperties()) {
+			childProperty.getContent(IObject.class).removeInvalidLinks(root, descendents, nonDescendents);
 		}
 		
 	}
-
+	
 	public void setContent(String propertyPath, Object content) {
+		setContent(propertyPath, content, false);
+	}
+
+	void setContent(String propertyPath, Object content, boolean copying) {
 		if (propertyPath.isEmpty())
 			return;
 
 		int firstSplit = propertyPath.indexOf('.');
 		if (firstSplit < 0) {
-			innerSetLocal(propertyPath, content);
+			innerSetLocal(propertyPath, content, copying);
 		} else {
 			String localProperty = propertyPath.substring(0, firstSplit);
 			String remainingPath = propertyPath.substring(firstSplit + 1);
 			IObject local = (IObject) getLocal(localProperty);
 			if (local != null)
-				local.setContent(remainingPath, content);
+				local.setContent(remainingPath, content, copying);
 		}
 	}
 	
 	protected void setLocal(String propertyName, Object content) {
-		// TODO Access through setter
 		FieldAccess fieldAccess = FieldAccess.get(getClass());
 		fieldAccess.set(this, propertyName, content);
 	}
@@ -436,7 +437,8 @@ public class IObject {
 	
 	public void write(OutputStream out) {
 		Output output = new Output(out);
-		kryo.writeClassAndObject(output, this.copy());
+		IObject copy = this.copy();
+		kryo.writeClassAndObject(output, copy);
 		output.close();
 	}
 

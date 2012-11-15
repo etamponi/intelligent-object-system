@@ -41,8 +41,11 @@ public class Property {
 		return (T)getContent();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setContent(Object content) {
+		setContent(content, false);
+	}
+	
+	void setContent(Object content, boolean copying) {
 		if (path.contains(ANY)) {
 			int indexPre = path.indexOf('*');
 			int indexAfter = indexPre + 2;
@@ -53,10 +56,11 @@ public class Property {
 			} else {
 				list = (IList<? extends IObject>)root;
 			}
-			for(int i = 0; i < list.size(); i++)
-				list.get(i).setContent(path.substring(indexAfter), content);
+			if (list != null)
+				for(int i = 0; i < list.size(); i++)
+					list.get(i).setContent(path.substring(indexAfter), content, copying);
 		} else {
-			root.setContent(path, content);
+			root.setContent(path, content, copying);
 		}
 	}
 	
