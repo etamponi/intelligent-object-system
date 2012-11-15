@@ -1,8 +1,5 @@
 package com.ios.errorchecks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ios.ErrorCheck;
 
 public class RangeCheck implements ErrorCheck<Number> {
@@ -29,13 +26,12 @@ public class RangeCheck implements ErrorCheck<Number> {
 	}
 
 	@Override
-	public List<String> getErrors(Number value) {
-		List<String> ret = new ArrayList<>();
+	public String getError(Number value) {
 		if (value.doubleValue() > upperBound.doubleValue())
-			ret.add("upper bound is " + upperBound + " (current value: " + value + ")");
+			return "upper bound is " + upperBound + " (current value: " + value + ")";
 		if (value.doubleValue() < lowerBound.doubleValue())
-			ret.add("lower bound is " + lowerBound + " (current value: " + value + ")");
-		return ret;
+			return "lower bound is " + lowerBound + " (current value: " + value + ")";
+		return null;
 	}
 
 }

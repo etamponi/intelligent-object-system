@@ -270,9 +270,9 @@ public class IList<E> extends IObject implements List<E> {
 	}
 
 	@Override
-	public Class<?> getType(String propertyName, boolean runtime) {
+	public Class<?> getContentType(String propertyName, boolean runtime) {
 		if (runtime)
-			return super.getType(propertyName, runtime);
+			return super.getContentType(propertyName, runtime);
 		else
 			return getElementType();
 	}

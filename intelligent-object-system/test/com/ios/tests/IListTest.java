@@ -1,9 +1,12 @@
-package com.ios;
+package com.ios.tests;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.ios.IList;
+import com.ios.IObject;
+import com.ios.Property;
 import com.ios.listeners.PropertyBinding;
 
 public class IListTest {

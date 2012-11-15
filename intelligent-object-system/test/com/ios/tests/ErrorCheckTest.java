@@ -1,4 +1,4 @@
-package com.ios;
+package com.ios.tests;
 
 import static org.junit.Assert.*;
 
@@ -7,8 +7,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.ios.IObject;
+import com.ios.Property;
 import com.ios.errorchecks.RangeCheck;
 import com.ios.errorchecks.RangeCheck.Bound;
+
 
 public class ErrorCheckTest {
 	

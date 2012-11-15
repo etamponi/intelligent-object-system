@@ -143,9 +143,9 @@ public class IMap<V> extends IObject implements Map<String, V> {
 	}
 
 	@Override
-	public Class<?> getType(String propertyName, boolean runtime) {
+	public Class<?> getContentType(String propertyName, boolean runtime) {
 		if (getFieldPropertyNames().contains(propertyName)) {
-			return super.getType(propertyName, runtime);
+			return super.getContentType(propertyName, runtime);
 		} else {
 			if (runtime) {
 				Object content = getContent(propertyName);

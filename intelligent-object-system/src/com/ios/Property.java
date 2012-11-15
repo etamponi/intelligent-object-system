@@ -1,5 +1,7 @@
 package com.ios;
 
+import java.util.Set;
+
 
 
 public class Property {
@@ -9,20 +11,32 @@ public class Property {
 	private final IObject root;
 	
 	private final String path;
+	
+	private static class Temporary extends IObject {
+		@SuppressWarnings("unused")
+		public Object content;
+		
+		public Temporary(Object content) {
+			setContent("content", content);
+		}
+	}
+	
+	public Property(Object content) {
+		this(new Temporary(content), "content");
+	}
 
 	public Property(IObject root, String path) {
 		this.root = root;
 		this.path = path;
 	}
 	
-	public Object getContent() {
+	public <T> T getContent() {
 		if (path.isEmpty())
-			return root;
+			return (T)root;
 		else
 			return root.getContent(path);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getContent(Class<T> contentType) {
 		return (T)getContent();
 	}
@@ -66,7 +80,7 @@ public class Property {
 	
 	@Override
 	public String toString() {
-		return "<"+root+">" + (path.isEmpty() ? "" : "." + path);
+		return path + ": " + (getContent() == null ? "<null>" : getContent());
 	}
 	
 	public boolean isParent(Property complete) {
@@ -80,12 +94,11 @@ public class Property {
 		String[] prefixTokens = this.path.split("\\.");
 		String[] completeTokens = complete.path.split("\\.");
 		if (!this.path.isEmpty()) {
-			
 			if (prefixTokens.length > completeTokens.length)
 				return false;
 			
 			for(int i = 0; i < prefixTokens.length; i++) {
-				if (completeTokens[i].equals(ANY))
+				if (completeTokens[i].equals(ANY) || prefixTokens[i].equals(ANY))
 					continue;
 				if (!prefixTokens[i].equals(completeTokens[i]))
 					return false;
@@ -93,8 +106,12 @@ public class Property {
 			
 			return parentOnly ? prefixTokens.length == completeTokens.length-1 : true;
 		} else {
-			return parentOnly ? completeTokens.length == 1 : true;
+			return parentOnly ? completeTokens[0].length() != 0 && completeTokens.length == 1 : true;
 		}
+	}
+	
+	public boolean includes(Property other) {
+		return other.isPrefix(this, false) && this.path.split("\\.").length == other.path.split("\\.").length;
 	}
 	
 	public IObject getParent() {
@@ -112,23 +129,35 @@ public class Property {
 		return new Property(getParent(), path.substring(path.lastIndexOf('.')+1));
 	}
 	
+	public Class<?> getContentType() {
+		return getContentType(false);
+	}
+	
 	public Class<?> getContentType(boolean runtime) {
 		if (runtime) {
 			Object content = getContent();
-			return content == null ? null : content.getClass();
+			return content == null ? getContentType(false) : content.getClass();
 		} else {
-			try {
-				Property local = getLocalProperty();
-				return local.root.getClass().getField(local.path).getType();
-			} catch (NoSuchFieldException | SecurityException e) {
-				return null;
-			}
+			Property local = getLocalProperty();
+			return local.root.getContentType(local.path, false);
 		}
 	}
 
 	@Override
 	public int hashCode() {
 		return root.hashCode() + path.hashCode();
+	}
+
+	public Set<Class> getCompatibleContentTypes() {
+		return getParent().getCompatibleContentTypes(getLocalProperty().getPath());
+	}
+	
+	public boolean isBound() {
+		return getParent().getBoundProperties().contains(getLocalProperty());
+	}
+	
+	public boolean isUnbound() {
+		return !isBound();
 	}
 	
 }
