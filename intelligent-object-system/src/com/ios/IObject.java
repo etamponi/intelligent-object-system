@@ -317,7 +317,7 @@ public class IObject {
 		if (level == MAXIMUM_CHANGE_PROPAGATION)
 			return;
 
-		for (Property linkToThis : parentsLinkToThis) {
+		for (Property linkToThis : new ArrayList<>(parentsLinkToThis)) {
 			if (seen.contains(linkToThis))
 				continue;
 			linkToThis.getRoot().propagateChange(prependParent(linkToThis, property), seen.plus(linkToThis), level + 1);
