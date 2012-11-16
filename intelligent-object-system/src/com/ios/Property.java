@@ -31,10 +31,7 @@ public class Property {
 	}
 	
 	public <T> T getContent() {
-		if (path.isEmpty())
-			return (T)root;
-		else
-			return root.getContent(path);
+		return root.getContent(path);
 	}
 	
 	public <T> T getContent(Class<T> contentType) {

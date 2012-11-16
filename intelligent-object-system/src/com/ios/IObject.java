@@ -37,7 +37,7 @@ public class IObject {
 		kryo.addDefaultSerializer(LinkList.class, LinkListSerializer.class);
 	}
 	
-	protected static Kryo getKryo() {
+	public static Kryo getKryo() {
 		return kryo;
 	}
 	
@@ -123,11 +123,17 @@ public class IObject {
 	}
 
 	public boolean isAncestor(IObject object) {
+		return recursiveIsAncestor(object, new HashSet<IObject>());
+	}
+	
+	private boolean recursiveIsAncestor(IObject object, Set<IObject> seen) {
+		seen.add(object);
 		if (this == object)
 			return true;
 		for (Property linkToThis : object.parentsLinkToThis) {
-			if (this.isAncestor(linkToThis.getRoot()))
-				return true;
+			if (!seen.contains(linkToThis.getRoot()))
+				if (recursiveIsAncestor(linkToThis.getRoot(), seen))
+					return true;
 		}
 		return false;
 	}
