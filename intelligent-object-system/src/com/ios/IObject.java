@@ -37,7 +37,7 @@ public class IObject {
 		kryo.addDefaultSerializer(LinkList.class, LinkListSerializer.class);
 	}
 	
-	public static Kryo getKryo() {
+	protected static Kryo getKryo() {
 		return kryo;
 	}
 	
@@ -84,7 +84,7 @@ public class IObject {
 		errorChecks.get(property).add(check);
 	}
 
-	public void addTrigger(Trigger trigger) {
+	protected void addTrigger(Trigger trigger) {
 		this.triggers.add(trigger);
 	}
 
@@ -157,7 +157,7 @@ public class IObject {
 	
 	public <T> T getContent(String propertyPath) {
 		if (propertyPath.isEmpty())
-			return null;
+			return (T)this;
 
 		int firstSplit = propertyPath.indexOf('.');
 		if (firstSplit < 0) {
@@ -323,6 +323,10 @@ public class IObject {
 			linkToThis.getRoot().propagateChange(prependParent(linkToThis, property), seen.plus(linkToThis), level + 1);
 		}
 	}
+	
+	public Property getProperty(String propertyName) {
+		return new Property(this, propertyName); // TODO: add some check to getProperty
+	}
 
 	private void recursivelyFindBoundProperties(Property prefixPath, List<Property> list, PSet<Property> seen) {
 		for (Trigger t: triggers)
@@ -407,7 +411,9 @@ public class IObject {
 	public void write(OutputStream out) {
 		Output output = new Output(out);
 		IObject copy = this.copy();
+		kryo.getContext().put("root", copy);
 		kryo.writeClassAndObject(output, copy);
+		kryo.getContext().remove("root");
 		output.close();
 	}
 

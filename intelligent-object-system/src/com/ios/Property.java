@@ -119,6 +119,8 @@ public class Property {
 			return root;
 		
 		String parentPath = path.substring(0, path.lastIndexOf('.'));
+		if (parentPath.endsWith("ANY"))
+			throw new UnsupportedOperationException("Cannot request parent of a generic path: " + path);
 		return root.getContent(parentPath, IObject.class);
 	}
 	
@@ -158,6 +160,13 @@ public class Property {
 	
 	public boolean isUnbound() {
 		return !isBound();
+	}
+
+	public String getLastPart() {
+		if (!path.contains("."))
+			return path;
+		else
+			return path.substring(path.lastIndexOf('.')+1);
 	}
 	
 }

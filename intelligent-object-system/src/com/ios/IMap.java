@@ -20,6 +20,8 @@ public class IMap<V> extends IObject implements Map<String, V> {
 	private final Map<String, V> internal;
 	
 	private boolean propagate = true;
+
+	public IMap() {valueType = null; internal = null;}
 	
 	public IMap(Class<V> valueType) {
 		this.valueType = valueType;

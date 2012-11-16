@@ -32,7 +32,7 @@ public abstract class Trigger {
 		List<Property> ret = new ArrayList<>();
 		for(Property bound: boundPaths) {
 			if (parentPath.isParent(bound))
-				ret.add(bound.getLocalProperty());
+				ret.add(new Property(parentPath.getContent(IObject.class), bound.getLastPart()));
 		}
 		return ret;
 	}
