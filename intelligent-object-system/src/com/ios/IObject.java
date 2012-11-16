@@ -34,6 +34,7 @@ public class IObject {
 
 	static {
 		kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+		kryo.addDefaultSerializer(LinkList.class, LinkListSerializer.class);
 	}
 	
 	public static Kryo getKryo() {
@@ -59,7 +60,7 @@ public class IObject {
 		return ret;
 	}
 
-	private final List<Property> parentsLinkToThis = new ArrayList<>();
+	private final LinkList parentsLinkToThis = new LinkList();
 
 	private final List<Trigger> triggers = new ArrayList<>();
 	
@@ -113,19 +114,19 @@ public class IObject {
 	}
 
 	public <T extends IObject> T copy() {
+		kryo.getContext().put("root", this);
+
 		IObject copy = kryo.copy(this);
 
-		copy.removeInvalidLinks(copy, new HashSet<IObject>(), new HashSet<IObject>());
-
+		kryo.getContext().remove("root");
 		return (T) copy;
 	}
 
-	private boolean descendFrom(IObject ancestor) {
-		if (this == ancestor) {
+	public boolean isAncestor(IObject object) {
+		if (this == object)
 			return true;
-		}
-		for (Property linkToThis : parentsLinkToThis) {
-			if (linkToThis.getRoot().descendFrom(ancestor))
+		for (Property linkToThis : object.parentsLinkToThis) {
+			if (this.isAncestor(linkToThis.getRoot()))
 				return true;
 		}
 		return false;
@@ -256,7 +257,7 @@ public class IObject {
 		return ret;
 	}
 
-	private void innerSetLocal(String propertyName, Object content, boolean copying) {
+	private void innerSetLocal(String propertyName, Object content) {
 		Property property = new Property(this, propertyName);
 
 		Object oldContent = getLocal(propertyName);
@@ -274,8 +275,7 @@ public class IObject {
 			((IObject) content).parentsLinkToThis.add(property);
 		}
 
-		if (!copying)
-			propagateChange(property, HashTreePSet.<Property> empty(), 0);
+		propagateChange(property, HashTreePSet.<Property> empty(), 0);
 	}
 
 	private void checkTriggers(Property changedPath) {
@@ -367,50 +367,19 @@ public class IObject {
 		}
 	}
 
-	private void removeInvalidLinks(IObject root, HashSet<IObject> descendents, HashSet<IObject> nonDescendents) {
-		for (Property linkToThis : new ArrayList<>(parentsLinkToThis)) {
-			IObject parent = linkToThis.getRoot();
-
-			if (descendents.contains(parent)) {
-				continue;
-			}
-
-			if (nonDescendents.contains(parent)) {
-				linkToThis.setContent(null, true);
-				continue;
-			}
-
-			if (parent.descendFrom(root)) {
-				descendents.add(parent);
-			} else {
-				nonDescendents.add(parent);
-				linkToThis.setContent(null, true);
-			}
-		}
-		
-		for (Property childProperty: getIntelligentProperties()) {
-			childProperty.getContent(IObject.class).removeInvalidLinks(root, descendents, nonDescendents);
-		}
-		
-	}
-	
 	public void setContent(String propertyPath, Object content) {
-		setContent(propertyPath, content, false);
-	}
-
-	void setContent(String propertyPath, Object content, boolean copying) {
 		if (propertyPath.isEmpty())
 			return;
 
 		int firstSplit = propertyPath.indexOf('.');
 		if (firstSplit < 0) {
-			innerSetLocal(propertyPath, content, copying);
+			innerSetLocal(propertyPath, content);
 		} else {
 			String localProperty = propertyPath.substring(0, firstSplit);
 			String remainingPath = propertyPath.substring(firstSplit + 1);
 			IObject local = (IObject) getLocal(localProperty);
 			if (local != null)
-				local.setContent(remainingPath, content, copying);
+				local.setContent(remainingPath, content);
 		}
 	}
 	

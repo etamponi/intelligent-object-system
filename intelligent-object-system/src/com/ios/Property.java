@@ -42,10 +42,6 @@ public class Property {
 	}
 	
 	public void setContent(Object content) {
-		setContent(content, false);
-	}
-	
-	void setContent(Object content, boolean copying) {
 		if (path.contains(ANY)) {
 			int indexPre = path.indexOf('*');
 			int indexAfter = indexPre + 2;
@@ -58,9 +54,9 @@ public class Property {
 			}
 			if (list != null)
 				for(int i = 0; i < list.size(); i++)
-					list.get(i).setContent(path.substring(indexAfter), content, copying);
+					list.get(i).setContent(path.substring(indexAfter), content);
 		} else {
-			root.setContent(path, content, copying);
+			root.setContent(path, content);
 		}
 	}
 	
