@@ -31,16 +31,20 @@ public class MasterSlaveTrigger extends Trigger {
 
 	@Override
 	public void action(Property changedPath) {
-		Object masterContent = master.getContent();
+		Object content = transform(master.getContent());
 		if (changedPath.isPrefix(master, false)) {
 			for(Property slave: getBoundProperties())
-				slave.setContent(masterContent);
+				slave.setContent(content);
 		} else {
 			for(Property slave: getBoundProperties()) {
 				if (changedPath.isPrefix(slave, false))
-					slave.setContent(masterContent);
+					slave.setContent(content);
 			}
 		}
+	}
+	
+	protected Object transform(final Object content) {
+		return content;
 	}
 
 }

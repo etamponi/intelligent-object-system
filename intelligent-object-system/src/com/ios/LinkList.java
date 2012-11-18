@@ -3,8 +3,9 @@ package com.ios;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LinkList extends ArrayList<Property> {
+class LinkList extends ArrayList<Property> {
 
+	// TODO Implement this as a list with an internal WeakHashMap
 	public LinkList() {
 		
 	}

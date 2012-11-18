@@ -11,7 +11,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CollectionSerializer;
 
-public class LinkListSerializer extends Serializer<Collection> {
+class LinkListSerializer extends Serializer<Collection> {
 	
 	private CollectionSerializer internal = new CollectionSerializer();
 
