@@ -12,8 +12,7 @@ public class Property {
 	
 	private final String path;
 	
-	private static class Temporary extends IObject {
-		@SuppressWarnings("unused")
+	public static class Temporary extends IObject {
 		public Object content;
 		
 		public Temporary(Object content) {

@@ -12,7 +12,7 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 public class IMap<V> extends IObject implements Map<String, V> {
 	
 	static {
-		getKryo().addDefaultSerializer(IMap.class, FieldSerializer.class);
+		getKryo().addDefaultSerializer(IMap.class, new FieldSerializer<>(getKryo(), IMap.class));
 	}
 
 	private final Class<V> valueType;

@@ -34,7 +34,6 @@ public class IObject {
 
 	static {
 		kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
-		kryo.addDefaultSerializer(LinkList.class, LinkListSerializer.class);
 	}
 	
 	public static Kryo getKryo() {
@@ -123,17 +122,17 @@ public class IObject {
 	}
 
 	public boolean isAncestor(IObject object) {
-		return recursiveIsAncestor(object, new HashSet<IObject>());
+		return recursiveIsAncestor(object, HashTreePSet.<Property>empty());
 	}
 	
-	private boolean recursiveIsAncestor(IObject object, Set<IObject> seen) {
-		seen.add(object);
+	private boolean recursiveIsAncestor(IObject object, PSet<Property> seen) {
 		if (this == object)
 			return true;
 		for (Property linkToThis : object.parentsLinkToThis) {
-			if (!seen.contains(linkToThis.getRoot()))
-				if (recursiveIsAncestor(linkToThis.getRoot(), seen))
-					return true;
+			if (seen.contains(linkToThis))
+				continue;
+			if (recursiveIsAncestor(linkToThis.getRoot(), seen.plus(linkToThis)))
+				return true;
 		}
 		return false;
 	}
@@ -417,9 +416,7 @@ public class IObject {
 	public void write(OutputStream out) {
 		Output output = new Output(out);
 		IObject copy = this.copy();
-		kryo.getContext().put("root", copy);
 		kryo.writeClassAndObject(output, copy);
-		kryo.getContext().remove("root");
 		output.close();
 	}
 

@@ -4,7 +4,11 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry exported="true" kind="lib" path="libs/kryo-2.20-all.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/kryo-2.20-all.jar" sourcepath="C:/Users/Emanuele/Downloads/kryo-2.20/java/src">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/C:/Users/Emanuele/Downloads/kryo-2.20/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="libs/pcollections-2.1.2.jar"/>
 	<classpathentry kind="lib" path="libs/reflections-0.9.8.jar"/>
 	<classpathentry kind="lib" path="libs/slf4j-api-1.6.1.jar"/>

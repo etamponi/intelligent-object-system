@@ -16,22 +16,20 @@ public class IList<E> extends IObject implements List<E> {
 	
 	private final Class<E> elementType;
 	
-	private final List<E> internal;
+	private final List<E> internal = new ArrayList<>();
 	
 	private boolean propagate = true;
 	
-	public IList() {elementType = null; internal = null;}
+	public IList() {elementType = null;}
 	
 	public IList(Class<E> elementType) {
 		this.elementType = elementType;
-		
-		this.internal = new ArrayList<>();
 	}
 	
-	public IList(Class<E> elementType, List<E> internal) {
+	public IList(Class<E> elementType, List<E> other) {
 		this.elementType = elementType;
 		
-		this.internal = internal;
+		this.internal.addAll(other);
 	}
 
 	@Override
