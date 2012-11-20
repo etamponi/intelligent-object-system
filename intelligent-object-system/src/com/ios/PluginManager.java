@@ -84,6 +84,17 @@ public class PluginManager {
 		conf.addUrls(ClasspathHelper.forClassLoader());
 		
 		internal = new Reflections(conf);
+		
+		Set<Class<? extends IOSSerializer>> serializers = internal.getSubTypesOf(IOSSerializer.class);
+		for(Class<? extends IOSSerializer> type: serializers) {
+			try {
+				IOSSerializer s = type.newInstance();
+				IObject.getKryo().addDefaultSerializer(s.getSerializingType(), s);
+				System.out.println("Serializer for " + s.getSerializingType().getSimpleName() + ": " + type.getSimpleName());
+			} catch (InstantiationException | IllegalAccessException e) {
+				System.err.println("Cannot instantiate class " + type);
+			}
+		}
 	}
 	
 	private static List<File> getExistentPaths(List<File> paths) {
