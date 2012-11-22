@@ -10,10 +10,16 @@ import org.junit.Test;
 
 import com.ios.IMap;
 import com.ios.IObject;
+import com.ios.PluginManager;
+import com.ios.PluginManager.PluginConfiguration;
 import com.ios.triggers.MasterSlaveTrigger;
 
 
 public class IMapTest {
+	
+	static {
+		PluginManager.initialize(new PluginConfiguration());
+	}
 	
 	public static class A extends IObject {
 		public String property1;

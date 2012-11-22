@@ -24,6 +24,7 @@ import org.pcollections.PSet;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IObject {
@@ -34,6 +35,8 @@ public class IObject {
 
 	static {
 		kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+		kryo.addDefaultSerializer(IList.class, FieldSerializer.class);
+		kryo.addDefaultSerializer(IMap.class, FieldSerializer.class);
 	}
 	
 	public static Kryo getKryo() {
@@ -59,7 +62,7 @@ public class IObject {
 		return ret;
 	}
 
-	private final LinkList parentsLinkToThis = new LinkList();
+	final LinkList parentsLinkToThis = new LinkList();
 
 	private final List<Trigger> triggers = new ArrayList<>();
 	
@@ -114,13 +117,17 @@ public class IObject {
 
 	public <T extends IObject> T copy() {
 		kryo.getContext().put("root", this);
+		kryo.getContext().put("descendents", new HashSet<IObject>());
+		kryo.getContext().put("nondescendents", new HashSet<IObject>());
 
 		IObject copy = kryo.copy(this);
 
 		kryo.getContext().remove("root");
+		kryo.getContext().remove("descendents");
+		kryo.getContext().remove("nondescendents");
 		return (T) copy;
 	}
-
+/*
 	public boolean isAncestor(IObject object) {
 		return recursiveIsAncestor(object, HashTreePSet.<Property>empty());
 	}
@@ -136,7 +143,7 @@ public class IObject {
 		}
 		return false;
 	}
-
+*/
 	public void detach() {
 		for (Property linkToThis : new ArrayList<>(parentsLinkToThis))
 			linkToThis.setContent(null);

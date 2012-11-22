@@ -6,13 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.esotericsoftware.kryo.serializers.FieldSerializer;
-
 public class IList<E> extends IObject implements List<E> {
-	
-	static {
-		getKryo().addDefaultSerializer(IList.class, FieldSerializer.class);
-	}
 	
 	private final Class<E> elementType;
 	
@@ -249,7 +243,6 @@ public class IList<E> extends IObject implements List<E> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void setLocal(String propertyName, Object content) {
 		if (propertyName.matches("^\\d+$")) {

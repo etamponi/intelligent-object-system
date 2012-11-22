@@ -6,10 +6,16 @@ import org.junit.Test;
 
 import com.ios.IList;
 import com.ios.IObject;
+import com.ios.PluginManager;
+import com.ios.PluginManager.PluginConfiguration;
 import com.ios.triggers.MasterSlaveTrigger;
 
 
 public class IListTest {
+	
+	static {
+		PluginManager.initialize(new PluginConfiguration());
+	}
 	
 	public static class A extends IObject {
 		public IList<String> list;
