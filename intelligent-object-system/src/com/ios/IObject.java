@@ -127,23 +127,7 @@ public class IObject {
 		kryo.getContext().remove("nondescendents");
 		return (T) copy;
 	}
-/*
-	public boolean isAncestor(IObject object) {
-		return recursiveIsAncestor(object, HashTreePSet.<Property>empty());
-	}
-	
-	private boolean recursiveIsAncestor(IObject object, PSet<Property> seen) {
-		if (this == object)
-			return true;
-		for (Property linkToThis : object.parentsLinkToThis) {
-			if (seen.contains(linkToThis))
-				continue;
-			if (recursiveIsAncestor(linkToThis.getRoot(), seen.plus(linkToThis)))
-				return true;
-		}
-		return false;
-	}
-*/
+
 	public void detach() {
 		for (Property linkToThis : new ArrayList<>(parentsLinkToThis))
 			linkToThis.setContent(null);
