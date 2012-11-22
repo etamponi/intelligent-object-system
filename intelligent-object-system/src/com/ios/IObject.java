@@ -328,6 +328,15 @@ public class IObject {
 		propagateChange(property, HashTreePSet.<Property> empty(), 0);
 	}
 	
+	protected void notifyObservers() {
+		for (Property linkToThis: new ArrayList<>(parentsLinkToThis)) {
+			IObject root = linkToThis.getRoot();
+			if (root instanceof Observer) {
+				root.checkTriggers(linkToThis);
+			}
+		}
+	}
+	
 	private void propagateChange(Property property, PSet<Property> seen, int level) {
 		property.getRoot().checkTriggers(property);
 

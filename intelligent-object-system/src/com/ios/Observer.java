@@ -25,8 +25,10 @@ public abstract class Observer extends IObject {
 			private Observer wrapper = Observer.this;
 			@Override
 			public void action(Property changedPath) {
-				String subPath = changedPath.getPath().substring(Observer.nameLength);
-				wrapper.action(new Property(wrapper.observed, subPath));
+				if (wrapper.observed != null) {
+					String subPath = changedPath.getPath().substring(Observer.nameLength);
+					wrapper.action(new Property(wrapper.observed, subPath));
+				}
 			}
 		});
 	}
