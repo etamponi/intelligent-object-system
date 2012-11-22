@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.objenesis.instantiator.ObjectInstantiator;
+import org.objenesis.strategy.InstantiatorStrategy;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.pcollections.HashTreePSet;
 import org.pcollections.PSet;
@@ -31,12 +33,21 @@ public class IObject {
 
 	public static final int MAXIMUM_CHANGE_PROPAGATION = 5;
 
-	private static final Kryo kryo = new Kryo();
+	private static final Kryo kryo = new Kryo() {
+		InstantiatorStrategy s = new StdInstantiatorStrategy();
+		@Override
+		protected ObjectInstantiator newInstantiator (final Class type) {
+			if (IObject.class.isAssignableFrom(type))
+				return s.newInstantiatorOf(type);
+			else
+				return super.newInstantiator(type);
+		}
+	};
 
 	static {
 		kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
-		kryo.addDefaultSerializer(IList.class, FieldSerializer.class);
-		kryo.addDefaultSerializer(IMap.class, FieldSerializer.class);
+		kryo.addDefaultSerializer(IList.class, new FieldSerializer(kryo, IList.class));
+		kryo.addDefaultSerializer(IMap.class, new FieldSerializer(kryo, IMap.class));
 	}
 	
 	public static Kryo getKryo() {
@@ -271,7 +282,7 @@ public class IObject {
 			((IObject) content).parentsLinkToThis.add(property);
 		}
 
-		propagateChange(property, HashTreePSet.<Property> empty(), 0);
+		propagateChange(property);
 	}
 
 	private void checkTriggers(Property changedPath) {

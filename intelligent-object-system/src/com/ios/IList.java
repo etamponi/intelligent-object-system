@@ -14,8 +14,6 @@ public class IList<E> extends IObject implements List<E> {
 	
 	private boolean propagate = true;
 	
-	public IList() {elementType = null;}
-	
 	public IList(Class<E> elementType) {
 		this.elementType = elementType;
 	}
