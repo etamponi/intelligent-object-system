@@ -117,7 +117,13 @@ public class Property {
 	}
 	
 	public boolean includes(Property other) {
-		return other.isPrefix(this, false) && this.path.split("\\.").length == other.path.split("\\.").length;
+		if (other.isPrefix(this, false)) {
+			if (this.path.isEmpty())
+				return other.path.isEmpty();
+			else
+				return this.path.split("\\.").length == other.path.split("\\.").length;
+		} else
+			return false;
 	}
 	
 	public IObject getParent() {

@@ -11,32 +11,28 @@
 package com.ios;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class IMap<V> extends IObject implements Map<String, V> {
 
 	private final Class<V> valueType;
 	
-	private final Map<String, V> internal;
+	private final Map<String, V> internal = new TreeMap<>();
 	
 	private boolean propagate = true;
 
-	public IMap() {valueType = null; internal = null;}
-	
 	public IMap(Class<V> valueType) {
 		this.valueType = valueType;
-		
-		this.internal = new HashMap<>();
 	}
 	
 	public IMap(Class<V> valueType, Map<String, V> internal) {
 		this.valueType = valueType;
 		
-		this.internal = internal;
+		this.internal.putAll(internal);
 	}
 
 	@Override

@@ -41,7 +41,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IObject {
 
-	public static final int MAXIMUM_CHANGE_PROPAGATION = 5;
+	public static final int MAXIMUM_CHANGE_PROPAGATION = 3;
 
 	private static final Kryo kryo = new Kryo() {
 		InstantiatorStrategy s = new StdInstantiatorStrategy();
@@ -335,6 +335,10 @@ public class IObject {
 				root.checkTriggers(linkToThis);
 			}
 		}
+	}
+	
+	public void editingFinished() {
+		propagateChange(new Property(this, ""));
 	}
 	
 	private void propagateChange(Property property, PSet<Property> seen, int level) {

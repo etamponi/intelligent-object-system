@@ -28,7 +28,7 @@ public class MasterSlaveTrigger extends Trigger {
 		
 		for(String slavePath: slavePaths) {
 			if (slavePath.split(".").length >= IObject.MAXIMUM_CHANGE_PROPAGATION)
-				System.err.println("Warning: change propagation will be incomplete");
+				System.err.println("Warning: change propagation may be incomplete");
 			
 			getBoundProperties().add(new Property(root, slavePath));
 			
