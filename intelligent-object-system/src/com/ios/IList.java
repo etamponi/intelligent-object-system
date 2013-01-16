@@ -117,6 +117,10 @@ public class IList<E> extends IObject implements List<E> {
 	public E get(int index) {
 		return internal.get(index);
 	}
+	
+	public <T extends E> T get(int index, Class<T> type) {
+		return (T)internal.get(index);
+	}
 
 	@Override
 	public int indexOf(Object o) {

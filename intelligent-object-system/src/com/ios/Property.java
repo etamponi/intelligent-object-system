@@ -22,6 +22,8 @@ public class Property {
 	
 	private final String path;
 	
+	private final String[] tokens;
+	
 	public static class Temporary extends IObject {
 		public Object content;
 		
@@ -37,6 +39,7 @@ public class Property {
 	public Property(IObject root, String path) {
 		this.root = root;
 		this.path = path;
+		this.tokens = path.split("\\.");
 	}
 	
 	public <T> T getContent() {
@@ -74,6 +77,10 @@ public class Property {
 		return path;
 	}
 	
+	public String[] getPathTokens() {
+		return tokens;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof Property) {
@@ -97,8 +104,8 @@ public class Property {
 		if (this.root != complete.root)
 			return false;
 
-		String[] prefixTokens = this.path.split("\\.");
-		String[] completeTokens = complete.path.split("\\.");
+		String[] prefixTokens = this.tokens;
+		String[] completeTokens = complete.tokens;
 		if (!this.path.isEmpty()) {
 			if (prefixTokens.length > completeTokens.length)
 				return false;
@@ -121,7 +128,7 @@ public class Property {
 			if (this.path.isEmpty())
 				return other.path.isEmpty();
 			else
-				return this.path.split("\\.").length == other.path.split("\\.").length;
+				return this.tokens.length == other.tokens.length;
 		} else
 			return false;
 	}
@@ -162,8 +169,8 @@ public class Property {
 		return root.hashCode() + path.hashCode();
 	}
 
-	public Set<Class> getCompatibleContentTypes() {
-		return getParent().getCompatibleContentTypes(getLocalProperty().getPath());
+	public Set<Class> getValidContentTypes() {
+		return getParent().getValidContentTypes(getLocalProperty().getPath());
 	}
 	
 	public boolean isBound() {

@@ -61,7 +61,7 @@ public class PluginManagerTest {
 		assertEquals(2, set.size());
 		assertTrue(set.containsAll(real));
 		
-		set = PluginManager.getCompatibleImplementationsOf(Parent.class, new Constraint() {
+		set = PluginManager.getValidImplementationsOf(Parent.class, new Constraint() {
 			@Override
 			public boolean isValid(Object o) {
 				return o.getClass().getSimpleName().length() < 8;

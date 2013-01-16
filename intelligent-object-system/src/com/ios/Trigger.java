@@ -21,7 +21,7 @@ public abstract class Trigger {
 
 	public abstract void action(Property changedPath);
 	
-	public void checkTrigger(Property changedPath) {
+	public void check(Property changedPath) {
 		for(Listener listener: listeners) {
 			if (listener.isListeningOn(changedPath)) {
 				action(changedPath);

@@ -95,6 +95,7 @@ public class PluginManager {
 				System.err.println("Cannot instantiate class " + type);
 			}
 		}
+		
 	}
 	
 	private static List<File> getExistentPaths(List<File> paths) {
@@ -131,12 +132,12 @@ public class PluginManager {
 				(!Modifier.isAbstract(type.getModifiers()) && !Modifier.isInterface(type.getModifiers()));
 	}
 	
-	public static <T> Set<Class> getCompatibleImplementationsOf(Class<T> base, Constraint constraint) {
+	public static <T> Set<Class> getValidImplementationsOf(Class<T> base, Constraint constraint) {
 		List<Constraint> temp = new ArrayList<>(1); temp.add(constraint);
-		return getCompatibleImplementationsOf(base, temp);
+		return getValidImplementationsOf(base, temp);
 	}
 	
-	public static <T> Set<Class> getCompatibleImplementationsOf(Class<T> base, List<Constraint> constraints) {
+	public static <T> Set<Class> getValidImplementationsOf(Class<T> base, List<Constraint> constraints) {
 		Set<Class> all = getImplementationsOf(base);
 		Set<Class> ret = new HashSet<>();
 		
