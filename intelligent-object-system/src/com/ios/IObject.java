@@ -40,7 +40,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IObject {
 
-	public static final int MAXIMUM_CHANGE_PROPAGATION = 4;
+	public static final int MAXIMUM_CHANGE_PROPAGATION = 6;
 
 	private static final Kryo kryo = new Kryo() {
 		InstantiatorStrategy s = new StdInstantiatorStrategy();
@@ -96,14 +96,15 @@ public class IObject {
 	
 	private List<String[]> omittedFromPropagation = new ArrayList<>();
 	
-	private Property linkFromEditor = null;
-	
 	public Property getLinkFromEditor() {
-		return linkFromEditor;
+		for(Property link: parentsLinkToThis)
+			if (link.getPathTokens().length > 1)
+				return link;
+		return null;
 	}
 	
 	public void startEdit(Property linkFromEditor) {
-		this.linkFromEditor = linkFromEditor;
+		parentsLinkToThis.add(linkFromEditor);
 	}
 	
 	protected void addConstraint(String propertyName, Constraint constraint) {
@@ -189,13 +190,8 @@ public class IObject {
 		kryo.getContext().put("descendents", new HashSet<IObject>());
 		kryo.getContext().put("nondescendents", new HashSet<IObject>());
 
-		Property linkFromEditor = this.linkFromEditor;
-		this.linkFromEditor = null;
-		
 		IObject copy = kryo.copy(this);
 		
-		this.linkFromEditor = linkFromEditor;
-
 		kryo.getContext().remove("root");
 		kryo.getContext().remove("descendents");
 		kryo.getContext().remove("nondescendents");
@@ -211,7 +207,7 @@ public class IObject {
 	}
 	
 	public void editingFinished() {
-		linkFromEditor = null;
+		parentsLinkToThis.remove(getLinkFromEditor());
 		propagateChange(new Property(this, ""));
 	}
 	
@@ -396,11 +392,10 @@ public class IObject {
 			return;
 
 		List<Property> linksToThis = new ArrayList<>();
-		if (linkFromEditor == null)
+		if (getLinkFromEditor() == null)
 			linksToThis.addAll(parentsLinkToThis);
 		else {
-			linksToThis.add(linkFromEditor);
-			linksToThis.addAll(getLinkFromSubEditors());
+			linksToThis.addAll(getLinkFromEditors());
 		}
 		
 		for (Property linkToThis : linksToThis) {
@@ -412,7 +407,7 @@ public class IObject {
 		}
 	}
 	
-	private List<Property> getLinkFromSubEditors() {
+	private List<Property> getLinkFromEditors() {
 		List<Property> ret = new ArrayList<>();
 		for(Property link: parentsLinkToThis) {
 			if (link.getRoot() instanceof Editor)
