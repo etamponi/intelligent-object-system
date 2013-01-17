@@ -40,7 +40,7 @@ import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IObject {
 
-	public static final int MAXIMUM_CHANGE_PROPAGATION = 6;
+	public static final int MAXIMUM_CHANGE_PROPAGATION = 10;
 
 	private static final Kryo kryo = new Kryo() {
 		InstantiatorStrategy s = new StdInstantiatorStrategy();
@@ -96,17 +96,6 @@ public class IObject {
 	
 	private List<String[]> omittedFromPropagation = new ArrayList<>();
 	
-	public Property getLinkFromEditor() {
-		for(Property link: parentsLinkToThis)
-			if (link.getPathTokens().length > 1)
-				return link;
-		return null;
-	}
-	
-	public void startEdit(Property linkFromEditor) {
-		parentsLinkToThis.add(linkFromEditor);
-	}
-	
 	protected void addConstraint(String propertyName, Constraint constraint) {
 		Property property = new Property(this, propertyName);
 		if (!constraints.containsKey(property))
@@ -114,54 +103,17 @@ public class IObject {
 		constraints.get(property).add(constraint);
 	}
 	
-	protected void omitFromErrorCheck(String... paths) {
-		for (String path: paths)
-			omittedFromErrorCheck.add(new Property(this, path));
-	}
-	
-	protected void omitFromPropagation(String... paths) {
-		for (String path: paths)
-			omittedFromPropagation.add(path.split("\\."));
-	}
-
 	protected void addErrorCheck(String propertyName, ErrorCheck check) {
 		Property property = new Property(this, propertyName);
 		if (!errorChecks.containsKey(property))
 			errorChecks.put(property, new ArrayList<ErrorCheck>());
 		errorChecks.get(property).add(check);
 	}
-
+	
 	protected void addTrigger(Trigger trigger) {
 		this.triggers.add(trigger);
 	}
-	/*
-	private Property appendChild(Property path, Property child) {
-		if (path.getPath().isEmpty())
-			return child;
-		else
-			return new Property(path.getRoot(), path.getPath() + "." + child.getPath());
-	}
 	
-	static int errorcount = 0;
-	private List<String> checkErrors(Property property) {
-		System.out.println(String.format("%4d checking errors %s", errorcount++, property));
-		List<String> ret = new ArrayList<>();
-		Object content = property.getContent();
-		if (content == null) {
-			ret.add("is null");
-		} else {
-			if (errorChecks.containsKey(property)) {
-				for (ErrorCheck check: errorChecks.get(property)) {
-					String error = check.getError(content);
-					if (error != null)
-						ret.add(error);
-				}
-			}
-		}
-		
-		return ret;
-	}
-	*/
 	private List<String> checkErrors() {
 		List<String> ret = new ArrayList<>();
 		for(Property p: errorChecks.keySet()) {
@@ -177,10 +129,8 @@ public class IObject {
 		}
 		return ret;
 	}
-
-	static int triggercount = 0;
+	
 	private void checkTriggers(Property changedPath) {
-//		System.out.println(String.format("%4d checking triggers for %s", triggercount++, changedPath.getPath()));
 		for (Trigger t: triggers)
 			t.check(changedPath);
 	}
@@ -210,13 +160,13 @@ public class IObject {
 		parentsLinkToThis.remove(getLinkFromEditor());
 		propagateChange(new Property(this, ""));
 	}
-	
+
 	public List<Property> getBoundProperties() {
 		List<Property> ret = new ArrayList<>();
 		recursivelyFindBoundProperties(new Property(this, ""), ret, HashTreePSet.<Property> empty());
 		return ret;
 	}
-	
+
 	public <T> T getContent(String propertyPath) {
 		if (propertyPath.isEmpty())
 			return (T)this;
@@ -234,7 +184,7 @@ public class IObject {
 				return null;
 		}
 	}
-	
+
 	public <T> T getContent(String propertyPath, Class<T> contentType) {
 		return (T) getContent(propertyPath);
 	}
@@ -251,7 +201,7 @@ public class IObject {
 			}
 		}
 	}
-
+	
 	public List<String> getErrors() {
 		List<String> ret = new ArrayList<>();
 
@@ -261,7 +211,7 @@ public class IObject {
 		
 		return ret;
 	}
-
+	
 	public List<String> getFieldPropertyNames() {
 		List<String> ret = new ArrayList<>();
 		
@@ -282,11 +232,11 @@ public class IObject {
 		
 		return ret;
 	}
-
+	
 	protected List<Property> getInstanceProperties() {
 		return new ArrayList<>();
 	}
-
+	
 	public List<Property> getIntelligentProperties() {
 		List<Property> ret = new ArrayList<>();
 		for (Property property: getProperties()) {
@@ -295,7 +245,23 @@ public class IObject {
 		}
 		return ret;
 	}
-	
+
+	public Property getLinkFromEditor() {
+		for(Property link: parentsLinkToThis)
+			if (link.getPathTokens().length > 1)
+				return link;
+		return null;
+	}
+
+	private List<Property> getLinkFromEditors() {
+		List<Property> ret = new ArrayList<>();
+		for(Property link: parentsLinkToThis) {
+			if (link.getRoot() instanceof Editor)
+				ret.add(link);
+		}
+		return ret;
+	}
+
 	protected Object getLocal(String propertyName) {
 		FieldAccess fieldAccess = FieldAccess.get(getClass());
 		return fieldAccess.get(this, propertyName);
@@ -304,7 +270,7 @@ public class IObject {
 	protected List<Property> getParentsLinksToThis() {
 		return parentsLinkToThis;
 	}
-
+	
 	public List<Property> getProperties() {
 		List<Property> ret = new ArrayList<>();
 
@@ -334,6 +300,18 @@ public class IObject {
 		return PluginManager.getValidImplementationsOf(getContentType(propertyName, false), list);
 	}
 
+	private boolean includes(String[] omitted, String[] tokens) {
+		if (omitted.length > tokens.length)
+			return false;
+		for(int i = 0; i < omitted.length; i++) {
+			if (omitted[i].equals(Property.ANY))
+				continue;
+			if (!omitted[i].equals(tokens[i]))
+				return false;
+		}
+		return true;
+	}
+
 	private void innerSetLocal(String propertyName, Object content) {
 		Property property = new Property(this, propertyName);
 
@@ -354,7 +332,7 @@ public class IObject {
 
 		propagateChange(property);
 	}
-	
+
 	protected void notifyObservers() {
 		for (Property linkToThis: new ArrayList<>(parentsLinkToThis)) {
 			IObject root = linkToThis.getRoot();
@@ -362,6 +340,25 @@ public class IObject {
 				root.checkTriggers(linkToThis);
 			}
 		}
+	}
+	
+	protected void omitFromErrorCheck(String... paths) {
+		for (String path: paths)
+			omittedFromErrorCheck.add(new Property(this, path));
+	}
+	
+	private boolean omitFromPropagation(Property fullPath) {
+		String[] tokens = fullPath.getPathTokens();
+		for(String[] omitted: omittedFromPropagation) {
+			if (includes(omitted, tokens))
+				return true;
+		}
+		return false;
+	}
+	
+	protected void omitFromPropagation(String... paths) {
+		for (String path: paths)
+			omittedFromPropagation.add(path.split("\\."));
 	}
 	
 	private Property prependParent(Property parent, Property path) {
@@ -386,7 +383,7 @@ public class IObject {
 	}
 	
 	private void propagateChange(Property path, PSet<Property> seen, int level) {
-		path.getRoot().checkTriggers(path);
+		this.checkTriggers(path);
 
 		if (level == MAXIMUM_CHANGE_PROPAGATION)
 			return;
@@ -403,40 +400,10 @@ public class IObject {
 				continue;
 			Property fullPath = prependParent(linkToThis, path);
 			if (!omitFromPropagation(fullPath))
-				linkToThis.getRoot().propagateChange(fullPath, seen.plus(linkToThis), level + 1);
+				fullPath.getRoot().propagateChange(fullPath, seen.plus(linkToThis), level + 1);
 		}
 	}
 	
-	private List<Property> getLinkFromEditors() {
-		List<Property> ret = new ArrayList<>();
-		for(Property link: parentsLinkToThis) {
-			if (link.getRoot() instanceof Editor)
-				ret.add(link);
-		}
-		return ret;
-	}
-	
-	private boolean includes(String[] omitted, String[] tokens) {
-		if (omitted.length > tokens.length)
-			return false;
-		for(int i = 0; i < omitted.length; i++) {
-			if (omitted[i].equals(Property.ANY))
-				continue;
-			if (!omitted[i].equals(tokens[i]))
-				return false;
-		}
-		return true;
-	}
-	
-	private boolean omitFromPropagation(Property fullPath) {
-		String[] tokens = fullPath.getPathTokens();
-		for(String[] omitted: omittedFromPropagation) {
-			if (includes(omitted, tokens))
-				return true;
-		}
-		return false;
-	}
-
 	private void recursivelyFindBoundProperties(Property path, List<Property> list, PSet<Property> seen) {
 		for (Trigger t: triggers)
 			list.addAll(t.getLocalBoundProperties(path));
@@ -480,19 +447,15 @@ public class IObject {
 			for(String error: subErrors)
 				errors.add(p.getPath() + "." + error);
 		}
-		
-		/*
-		for(Property property: getUnboundProperties()) {
-			Property complete = appendChild(basePath, property);
-			
-			List<String> list = checkErrors(property);
-			if (!list.isEmpty())
-				errors.put(complete, list);
-			if (property.getContent() instanceof IObject && !omittedFromErrorCheck.contains(property)) {
-				property.getContent(IObject.class).recursivelyFindErrors(complete, errors, seen);
-			}
+	}
+
+	public void replace(IObject other) {
+		if (!other.getClass().equals(this.getClass()))
+			return;
+		for(Property linkToOther: new ArrayList<>(other.parentsLinkToThis)) {
+			linkToOther.setContent(this);
 		}
-		*/
+		other.detach();
 	}
 
 	public void setContent(String propertyPath, Object content) {
@@ -516,6 +479,10 @@ public class IObject {
 		fieldAccess.set(this, propertyName, content);
 	}
 	
+	public void startEdit(Property linkFromEditor) {
+		parentsLinkToThis.add(linkFromEditor);
+	}
+	
 	@Override
 	public String toString() {
 		return name;
@@ -537,15 +504,6 @@ public class IObject {
 		IObject copy = this.copy();
 		kryo.writeClassAndObject(output, copy);
 		output.close();
-	}
-	
-	public void replace(IObject other) {
-		if (!other.getClass().equals(this.getClass()))
-			return;
-		for(Property linkToOther: new ArrayList<>(other.parentsLinkToThis)) {
-			linkToOther.setContent(this);
-		}
-		other.detach();
 	}
 
 }
