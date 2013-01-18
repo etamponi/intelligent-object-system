@@ -480,7 +480,8 @@ public class IObject {
 	}
 	
 	public void startEdit(Property linkFromEditor) {
-		parentsLinkToThis.add(linkFromEditor);
+		if (linkFromEditor != null)
+			parentsLinkToThis.add(linkFromEditor);
 	}
 	
 	@Override
