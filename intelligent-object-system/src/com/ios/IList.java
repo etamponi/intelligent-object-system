@@ -285,5 +285,10 @@ public class IList<E> extends IObject implements List<E> {
 	public Class<E> getElementType() {
 		return elementType;
 	}
+	
+	@Override
+	public String toString() {
+		return internal.toString();
+	}
 
 }

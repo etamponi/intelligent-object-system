@@ -44,15 +44,19 @@ public class MasterSlaveTrigger extends Trigger {
 		Object content = transform(master.getContent());
 		if (changedPath.isPrefix(master, false)) {
 			for(Property slave: getBoundProperties())
-				slave.setContent(content);
+				updateSlave(slave, content);
 		} else {
 			for(Property slave: getBoundProperties()) {
 				if (changedPath.isPrefix(slave, false))
-					slave.setContent(content);
+					updateSlave(slave, content);
 			}
 		}
 	}
 	
+	protected void updateSlave(Property slave, Object content) {
+		slave.setContent(content);
+	}
+
 	protected Object transform(final Object content) {
 		return content;
 	}

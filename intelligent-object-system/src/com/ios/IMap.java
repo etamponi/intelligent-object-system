@@ -161,5 +161,10 @@ public class IMap<V> extends IObject implements Map<String, V> {
 	public Class<V> getValueType() {
 		return valueType;
 	}
+	
+	@Override
+	public String toString() {
+		return internal.toString();
+	}
 
 }
