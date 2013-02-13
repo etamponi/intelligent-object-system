@@ -126,7 +126,8 @@ public class IObject {
 		List<String> ret = new ArrayList<>();
 		for(Property p: errorChecks.keySet()) {
 			if (p.getContent() == null) {
-				ret.add(p.getPath() + ": is null");
+				if (p.isLocal() && !omittedFromErrorCheck.contains(p.getPath()))
+					ret.add(p.getPath() + ": is null");
 			} else {
 				Object content = p.getContent();
 				for (ErrorCheck check: errorChecks.get(p)) {

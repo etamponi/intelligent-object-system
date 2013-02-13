@@ -190,5 +190,9 @@ public class Property {
 		else
 			return path.substring(path.lastIndexOf('.')+1);
 	}
+
+	public boolean isLocal() {
+		return root.getProperties().contains(this);
+	}
 	
 }
