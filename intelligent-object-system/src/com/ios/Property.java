@@ -61,9 +61,12 @@ public class Property {
 			} else {
 				list = (IList<? extends IObject>)root;
 			}
-			if (list != null)
-				for(int i = 0; i < list.size(); i++)
-					list.get(i).setContent(path.substring(indexAfter), content);
+			if (list != null) {
+				for(int i = 0; i < list.size(); i++) {
+					if (list.get(i) != null) 
+						list.get(i).setContent(path.substring(indexAfter), content);
+				}
+			}
 		} else {
 			root.setContent(path, content);
 		}

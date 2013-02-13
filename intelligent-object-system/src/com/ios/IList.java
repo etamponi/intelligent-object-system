@@ -250,6 +250,11 @@ public class IList<E> extends IObject implements List<E> {
 				return get(index);
 			else
 				return null;
+		} else if (propertyName.equals("last")) {
+			if (!internal.isEmpty())
+				return get(internal.size()-1);
+			else
+				return null;
 		} else {
 			return super.getLocal(propertyName);
 		}

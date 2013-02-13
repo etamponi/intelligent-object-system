@@ -16,6 +16,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -39,6 +43,10 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.reflectasm.FieldAccess;
 
 public class IObject {
+	
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
+	public static @interface InName {}
 
 	public static final int MAXIMUM_CHANGE_PROPAGATION = 10;
 
@@ -90,7 +98,7 @@ public class IObject {
 	
 	private final Map<Property, List<Constraint>> constraints = new HashMap<>();
 
-	public String name = String.format("%s-%02d", getClass().getSimpleName(), hashCode() % 100);
+//	public String name = String.format("%s-%02d", getClass().getSimpleName(), hashCode() % 100);
 	
 	private List<Property> omittedFromErrorCheck = new ArrayList<>();
 	
@@ -486,7 +494,19 @@ public class IObject {
 	
 	@Override
 	public String toString() {
-		return name;
+		try {
+			StringBuilder builder = new StringBuilder(getClass().getSimpleName());
+			builder.append(" { ");
+			for (Property p: getProperties()) {
+				if (getClass().getField(p.getPath()).isAnnotationPresent(InName.class)) {
+					builder.append(p.getPath()).append(": ").append(p.getContent()).append("; ");
+				}
+			}
+			builder.append("}");
+			return builder.toString();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	public void write(File outFile) {

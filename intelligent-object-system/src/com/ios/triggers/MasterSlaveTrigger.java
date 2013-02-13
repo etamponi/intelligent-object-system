@@ -15,7 +15,7 @@ import com.ios.Property;
 import com.ios.Trigger;
 import com.ios.listeners.PrefixListener;
 
-public class MasterSlaveTrigger extends Trigger {
+public class MasterSlaveTrigger<O> extends Trigger {
 	
 	private final Property master;
 
@@ -41,24 +41,20 @@ public class MasterSlaveTrigger extends Trigger {
 
 	@Override
 	public void action(Property changedPath) {
-		Object content = transform(master.getContent());
+		O masterContent = (O)master.getContent();
 		if (changedPath.isPrefix(master, false)) {
 			for(Property slave: getBoundProperties())
-				updateSlave(slave, content);
+				updateSlave(slave, masterContent);
 		} else {
 			for(Property slave: getBoundProperties()) {
 				if (changedPath.isPrefix(slave, false))
-					updateSlave(slave, content);
+					updateSlave(slave, masterContent);
 			}
 		}
 	}
 	
-	protected void updateSlave(Property slave, Object content) {
-		slave.setContent(content);
-	}
-
-	protected Object transform(final Object content) {
-		return content;
+	protected void updateSlave(Property slave, O masterContent) {
+		slave.setContent(masterContent);
 	}
 
 }
