@@ -102,8 +102,6 @@ public class IObject {
 	
 	private List<Property> omittedFromErrorCheck = new ArrayList<>();
 	
-	private List<String[]> omittedFromPropagation = new ArrayList<>();
-	
 	protected void addConstraint(String propertyName, Constraint constraint) {
 		Property property = new Property(this, propertyName);
 		if (!constraints.containsKey(property))
@@ -214,8 +212,6 @@ public class IObject {
 	public List<String> getErrors() {
 		List<String> ret = new ArrayList<>();
 
-//		ret.put(new Property(this, ""), checkErrors(new Property(this, "")));
-		
 		recursivelyFindErrors(ret, new HashSet<IObject>());
 		
 		return ret;
@@ -309,18 +305,6 @@ public class IObject {
 		return PluginManager.getValidImplementationsOf(getContentType(propertyName, false), list);
 	}
 
-	private boolean includes(String[] omitted, String[] tokens) {
-		if (omitted.length > tokens.length)
-			return false;
-		for(int i = 0; i < omitted.length; i++) {
-			if (omitted[i].equals(Property.ANY))
-				continue;
-			if (!omitted[i].equals(tokens[i]))
-				return false;
-		}
-		return true;
-	}
-
 	private void innerSetLocal(String propertyName, Object content) {
 		Property property = new Property(this, propertyName);
 
@@ -354,20 +338,6 @@ public class IObject {
 	protected void omitFromErrorCheck(String... paths) {
 		for (String path: paths)
 			omittedFromErrorCheck.add(new Property(this, path));
-	}
-	
-	private boolean omitFromPropagation(Property fullPath) {
-		String[] tokens = fullPath.getPathTokens();
-		for(String[] omitted: omittedFromPropagation) {
-			if (includes(omitted, tokens))
-				return true;
-		}
-		return false;
-	}
-	
-	protected void omitFromPropagation(String... paths) {
-		for (String path: paths)
-			omittedFromPropagation.add(path.split("\\."));
 	}
 	
 	private Property prependParent(Property parent, Property path) {
@@ -408,8 +378,7 @@ public class IObject {
 			if (seen.contains(linkToThis))
 				continue;
 			Property fullPath = prependParent(linkToThis, path);
-			if (!omitFromPropagation(fullPath))
-				fullPath.getRoot().propagateChange(fullPath, seen.plus(linkToThis), level + 1);
+			fullPath.getRoot().propagateChange(fullPath, seen.plus(linkToThis), level + 1);
 		}
 	}
 	
@@ -421,8 +390,7 @@ public class IObject {
 			if (seen.contains(linkToThis))
 				continue;
 			Property fullPath = prependParent(linkToThis, path);
-			if (!omitFromPropagation(fullPath))
-				linkToThis.getRoot().recursivelyFindBoundProperties(fullPath, list, seen.plus(linkToThis));
+			linkToThis.getRoot().recursivelyFindBoundProperties(fullPath, list, seen.plus(linkToThis));
 		}
 	}
 
@@ -436,8 +404,7 @@ public class IObject {
 			if (seen.contains(linkToThis))
 				continue;
 			Property fullPath = prependParent(linkToThis, path);
-			if (!omitFromPropagation(fullPath))
-				linkToThis.getRoot().recursivelyFindConstraints(fullPath, list, seen.plus(linkToThis));
+			linkToThis.getRoot().recursivelyFindConstraints(fullPath, list, seen.plus(linkToThis));
 		}
 	}
 
