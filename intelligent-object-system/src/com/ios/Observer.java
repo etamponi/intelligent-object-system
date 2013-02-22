@@ -15,7 +15,7 @@ import com.ios.triggers.SimpleTrigger;
 
 public abstract class Observer extends IObject {
 	
-	private static final int nameLength = "observed".length();
+	private static final int PROPERTYLEN = "observed".length();
 	
 	public IObject observed;
 	
@@ -26,7 +26,7 @@ public abstract class Observer extends IObject {
 			@Override
 			public void action(Property changedPath) {
 				if (wrapper.observed != null) {
-					String subPath = changedPath.getPath().substring(Observer.nameLength);
+					String subPath = changedPath.getPath().substring(PROPERTYLEN);
 					wrapper.action(new Property(wrapper.observed, subPath));
 				}
 			}
