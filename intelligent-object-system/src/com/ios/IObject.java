@@ -97,8 +97,6 @@ public class IObject {
 	private final List<ErrorCheck> errorChecks = new ArrayList<>();
 	
 	private final Map<Property, List<Constraint>> constraints = new HashMap<>();
-
-//	public String name = String.format("%s-%02d", getClass().getSimpleName(), hashCode() % 100);
 	
 	private List<Property> omittedFromErrorCheck = new ArrayList<>();
 	
@@ -115,7 +113,8 @@ public class IObject {
 	}
 	
 	protected void addTrigger(Trigger trigger) {
-		this.triggers.add(trigger);
+		trigger.setRoot(this);
+		triggers.add(trigger);
 	}
 	
 	private List<String> checkErrors() {
@@ -130,7 +129,7 @@ public class IObject {
 	
 	private void checkTriggers(Property changedPath) {
 		for (Trigger t: triggers)
-			t.check(changedPath);
+			t.action(changedPath);
 	}
 
 	public <T extends IObject> T copy() {

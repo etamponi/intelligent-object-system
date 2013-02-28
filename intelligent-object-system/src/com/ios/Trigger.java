@@ -13,34 +13,34 @@ package com.ios;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Trigger {
+public abstract class Trigger<T extends IObject> {
+		
+	private final List<String> boundPaths = new ArrayList<String>();
 	
-	private final List<Listener> listeners = new ArrayList<>();
-	
-	private final List<Property> boundPaths = new ArrayList<>();
+	private T root;
 
 	public abstract void action(Property changedPath);
 	
-	public void check(Property changedPath) {
-		for(Listener listener: listeners) {
-			if (listener.isListeningOn(changedPath)) {
-				action(changedPath);
-				break;
-			}
-		}
+	public void setRoot(T root) {
+		this.root = root;
 	}
 	
-	public List<Listener> getListeners() {
-		return listeners;
+	protected T getRoot() {
+		return root;
 	}
 	
-	public List<Property> getBoundProperties() {
+	protected <TT extends T> TT getRoot(Class<TT> type) {
+		return (TT)root;
+	}
+	
+	public List<String> getBoundPaths() {
 		return boundPaths;
 	}
 
 	public List<Property> getLocalBoundProperties(Property parentPath) {
 		List<Property> ret = new ArrayList<>();
-		for(Property bound: boundPaths) {
+		for(String boundPath: boundPaths) {
+			Property bound = getRoot().getProperty(boundPath);
 			if (parentPath.isParent(bound))
 				ret.add(new Property(parentPath.getContent(IObject.class), bound.getLastPart()));
 		}

@@ -21,13 +21,11 @@ public abstract class Observer extends IObject {
 	
 	public Observer(IObject observed) {
 		setContent("observed", observed);
-		addTrigger(new SimpleTrigger(new SubPathListener(new Property(this, "observed"))) {
-			private Observer wrapper = Observer.this;
-			@Override
-			public void action(Property changedPath) {
-				if (wrapper.observed != null) {
+		addTrigger(new SimpleTrigger<Observer>(new SubPathListener(getProperty("observed"))) {
+			@Override protected void makeAction(Property changedPath) {
+				if (getRoot().observed != null) {
 					String subPath = changedPath.getPath().substring(PROPERTYLEN);
-					wrapper.action(new Property(wrapper.observed, subPath));
+					getRoot().action(new Property(getRoot().observed, subPath));
 				}
 			}
 		});
