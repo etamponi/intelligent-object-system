@@ -10,10 +10,11 @@
  ******************************************************************************/
 package com.ios.triggers;
 
+import com.ios.IObject;
 import com.ios.Property;
 import com.ios.Trigger;
 
-public class BoundProperties extends Trigger {
+public class BoundProperties<T extends IObject> extends Trigger<T> {
 	
 	public BoundProperties(String... paths) {
 		for(String path: paths)

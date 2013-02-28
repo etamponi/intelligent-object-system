@@ -18,7 +18,6 @@ import com.ios.Listener;
 import com.ios.Property;
 import com.ios.Trigger;
 import com.ios.listeners.PrefixListener;
-import com.ios.listeners.SubPathListener;
 
 public class MasterSlaveTrigger<O> extends Trigger {
 	
@@ -32,7 +31,7 @@ public class MasterSlaveTrigger<O> extends Trigger {
 		master = new Property(root, masterPath);
 		
 		listeners.add(new PrefixListener(master));
-		listeners.add(new SubPathListener(master));
+//		listeners.add(new SubPathListener(master));
 		
 		for(String slavePath: slavePaths) {
 			if (slavePath.split(".").length >= IObject.MAXIMUM_CHANGE_PROPAGATION)
