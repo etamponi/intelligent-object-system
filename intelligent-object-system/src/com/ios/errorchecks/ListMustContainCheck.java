@@ -14,19 +14,18 @@ package com.ios.errorchecks;
 
 import java.util.List;
 
-import com.ios.ErrorCheck;
 
-
-public class ListMustContainCheck implements ErrorCheck<List<?>> {
+public class ListMustContainCheck extends PropertyCheck<List> {
 	
 	private Object element;
 
-	public ListMustContainCheck(Object element) {
+	public ListMustContainCheck(String path, Object element) {
+		super(path);
 		this.element = element;
 	}
 
 	@Override
-	public String getError(List<?> value) {
+	protected String getError(List value) {
 		if (!value.contains(element))
 			return "list must contain " + element;
 		else

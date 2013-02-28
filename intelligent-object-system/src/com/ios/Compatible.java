@@ -12,6 +12,6 @@ package com.ios;
 
 public interface Compatible<T> {
 
-	boolean isCompatible(T object);
+	public String compatibilityError(T object);
 	
 }

@@ -14,25 +14,25 @@ package com.ios.errorchecks;
 
 import java.util.Collection;
 
-import com.ios.ErrorCheck;
 
-
-public class SizeCheck implements ErrorCheck<Collection<?>> {
+public class SizeCheck extends PropertyCheck<Collection> {
 	
 	private int minimumSize, maximumSize;
 
-	public SizeCheck(int minimumSize) {
+	public SizeCheck(String path, int minimumSize) {
+		super(path);
 		this.minimumSize = minimumSize;
 		this.maximumSize = Integer.MAX_VALUE;
 	}
 	
-	public SizeCheck(int minimumSize, int maximumSize) {
+	public SizeCheck(String path, int minimumSize, int maximumSize) {
+		super(path);
 		this.minimumSize = minimumSize;
 		this.maximumSize = maximumSize;
 	}
 
 	@Override
-	public String getError(Collection<?> value) {
+	protected String getError(Collection value) {
 		if (value.size() < minimumSize)
 			return "should have at least " + minimumSize + " elements";
 		else if (value.size() > maximumSize)

@@ -10,18 +10,18 @@
  ******************************************************************************/
 package com.ios.errorchecks;
 
-import com.ios.ErrorCheck;
 
-public class LengthCheck implements ErrorCheck<String> {
+public class LengthCheck extends PropertyCheck<String> {
 	
 	private int minimumLength;
 	
-	public LengthCheck(int minimumLength) {
+	public LengthCheck(String path, int minimumLength) {
+		super(path);
 		this.minimumLength = minimumLength;
 	}
 
 	@Override
-	public String getError(String value) {
+	protected String getError(String value) {
 		if (value.length() < minimumLength)
 			return "must have at least " + minimumLength + " characters";
 		else

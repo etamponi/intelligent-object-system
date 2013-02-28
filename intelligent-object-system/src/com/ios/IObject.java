@@ -94,7 +94,7 @@ public class IObject {
 
 	private final List<Trigger> triggers = new ArrayList<>();
 	
-	private final Map<Property, List<ErrorCheck>> errorChecks = new HashMap<>();
+	private final List<ErrorCheck> errorChecks = new ArrayList<>();
 	
 	private final Map<Property, List<Constraint>> constraints = new HashMap<>();
 
@@ -109,11 +109,9 @@ public class IObject {
 		constraints.get(property).add(constraint);
 	}
 	
-	protected void addErrorCheck(String propertyName, ErrorCheck check) {
-		Property property = new Property(this, propertyName);
-		if (!errorChecks.containsKey(property))
-			errorChecks.put(property, new ArrayList<ErrorCheck>());
-		errorChecks.get(property).add(check);
+	protected void addErrorCheck(ErrorCheck check) {
+		check.setRoot(this);
+		errorChecks.add(check);
 	}
 	
 	protected void addTrigger(Trigger trigger) {
@@ -122,17 +120,10 @@ public class IObject {
 	
 	private List<String> checkErrors() {
 		List<String> ret = new ArrayList<>();
-		for(Property p: errorChecks.keySet()) {
-			if (p.getContent() == null) {
-				if (p.isLocal() && !omittedFromErrorCheck.contains(p.getPath()))
-					ret.add(p.getPath() + ": is null");
-			} else {
-				Object content = p.getContent();
-				for (ErrorCheck check: errorChecks.get(p)) {
-					String error = check.getError(content);
-					if (error != null) ret.add(p.getPath() + ": " + error);
-				}
-			}
+		for(ErrorCheck check: errorChecks) {
+			String error = check.getError();
+			if (error != null)
+				ret.add(error);
 		}
 		return ret;
 	}

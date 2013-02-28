@@ -14,21 +14,18 @@ import com.ios.Compatible;
 import com.ios.Constraint;
 import com.ios.Property;
 
-public class CompatibleWith implements Constraint<Compatible> {
+public class CompatibilityConstraint implements Constraint<Compatible> {
 	
 	private final Property property;
 
-	public CompatibleWith(Property property) {
+	public CompatibilityConstraint(Property property) {
 		this.property = property;
 	}
 
 	@Override
 	public boolean isValid(Compatible o) {
 		Object obj = property.getContent();
-		if (obj != null)
-			return o.isCompatible(obj);
-		else
-			return false;
+		return o.compatibilityError(obj) == null;
 	}
 
 }

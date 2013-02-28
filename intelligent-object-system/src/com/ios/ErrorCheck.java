@@ -11,8 +11,22 @@
 package com.ios;
 
 
-public interface ErrorCheck<T> {
+public abstract class ErrorCheck<T extends IObject> {
 	
-	public String getError(T value);
+	private T root;
+	
+	public void setRoot(T root) {
+		this.root = root;
+	}
+	
+	public T getRoot() {
+		return root;
+	}
+	
+	public <TT extends T> TT getRoot(Class<TT> type) {
+		return (TT)root;
+	}
+	
+	public abstract String getError();
 
 }

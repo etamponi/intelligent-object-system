@@ -14,13 +14,15 @@ package com.ios.errorchecks;
 
 import java.io.File;
 
-import com.ios.ErrorCheck;
 
-
-public class FileExistsCheck implements ErrorCheck<File> {
+public class FileExistsCheck extends PropertyCheck<File> {
+	
+	public FileExistsCheck(String path) {
+		super(path);
+	}
 
 	@Override
-	public String getError(File value) {
+	protected String getError(File value) {
 		if (!value.exists())
 			return "file specified does not exist";
 		else

@@ -10,18 +10,18 @@
  ******************************************************************************/
 package com.ios.errorchecks;
 
-import com.ios.ErrorCheck;
 
-public class PositivenessCheck implements ErrorCheck<Number> {
+public class PositivenessCheck extends PropertyCheck<Number> {
 	
 	private boolean zeroAccepted;
 	
-	public PositivenessCheck(boolean zeroAccepted) {
+	public PositivenessCheck(String path, boolean zeroAccepted) {
+		super(path);
 		this.zeroAccepted = zeroAccepted;
 	}
 
 	@Override
-	public String getError(Number value) {
+	protected String getError(Number value) {
 		if (value.doubleValue() < 0 || (!zeroAccepted && value.doubleValue() == 0))
 			return "should be positive" + (zeroAccepted ? " or zero" : "");
 		else

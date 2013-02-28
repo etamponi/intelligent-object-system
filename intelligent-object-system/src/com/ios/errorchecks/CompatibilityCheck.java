@@ -12,23 +12,21 @@ package com.ios.errorchecks;
 
 import com.ios.Compatible;
 import com.ios.ErrorCheck;
+import com.ios.IObject;
 
-@SuppressWarnings("rawtypes")
-public class CompatibilityCheck implements ErrorCheck {
+public class CompatibilityCheck extends ErrorCheck<IObject> {
 	
-	private Compatible compatible;
+	private String compatibilityPath;
 	
-	public CompatibilityCheck(Compatible compatible) {
-		this.compatible = compatible;
+	public CompatibilityCheck(String compatibilityPath) {
+		this.compatibilityPath = compatibilityPath;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public String getError(Object value) {
-		if (!compatible.isCompatible(value))
-			return "this value is not compatible with the option";
-		else
-			return null;
+	public String getError() {
+		Compatible o = (Compatible)getRoot();
+		Object content = getRoot().getContent(compatibilityPath);
+		return o.compatibilityError(content);
 	}
 
 }

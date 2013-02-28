@@ -16,14 +16,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.ios.ErrorCheck;
 
-
-public class NoRepetitionCheck implements ErrorCheck<List<?>> {
+public class NoRepetitionCheck extends PropertyCheck<List> {
+	
+	public NoRepetitionCheck(String path) {
+		super(path);
+	}
 
 	@Override
-	public String getError(List<?> value) {
-		Set<?> set = new HashSet<>(value);
+	protected String getError(List value) {
+		Set set = new HashSet<>(value);
 		if (set.size() < value.size())
 			return "cannot have repetitions";
 		else

@@ -10,9 +10,8 @@
  ******************************************************************************/
 package com.ios.errorchecks;
 
-import com.ios.ErrorCheck;
 
-public class RangeCheck implements ErrorCheck<Number> {
+public class RangeCheck extends PropertyCheck<Number> {
 	
 	private Number lowerBound, upperBound;
 	
@@ -20,12 +19,14 @@ public class RangeCheck implements ErrorCheck<Number> {
 		LOWER, UPPER
 	}
 	
-	public RangeCheck(Number lowerBound, Number upperBound) {
+	public RangeCheck(String path, Number lowerBound, Number upperBound) {
+		super(path);
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
 	}
 	
-	public RangeCheck(Number bound, Bound type) {
+	public RangeCheck(String path, Number bound, Bound type) {
+		super(path);
 		if (type == Bound.LOWER) {
 			this.lowerBound = bound;
 			this.upperBound = Double.POSITIVE_INFINITY;
@@ -36,7 +37,7 @@ public class RangeCheck implements ErrorCheck<Number> {
 	}
 
 	@Override
-	public String getError(Number value) {
+	protected String getError(Number value) {
 		if (value.doubleValue() > upperBound.doubleValue())
 			return "upper bound is " + upperBound + " (current value: " + value + ")";
 		if (value.doubleValue() < lowerBound.doubleValue())
