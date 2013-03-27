@@ -33,6 +33,14 @@ public class IList<E> extends IObject implements List<E> {
 		
 		this.internal.addAll(other);
 	}
+	
+	public IList(Class<E> elementType, E... elements) {
+		this.elementType = elementType;
+		
+		for (E e: elements) {
+			this.internal.add(e);
+		}
+	}
 
 	@Override
 	public boolean add(E e) {
